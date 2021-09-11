@@ -30,11 +30,13 @@ import java.io.InputStream
 import java.io.Reader
 import java.io.StringReader
 import java.net.URL
+import java.nio.charset.Charset
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+
 import io.kjson.mustache.Element
 import io.kjson.mustache.InvertedSection
 import io.kjson.mustache.LiteralVariable
@@ -45,18 +47,35 @@ import io.kjson.mustache.TemplatePartial
 import io.kjson.mustache.TextElement
 import io.kjson.mustache.Variable
 
+/**
+ * Mustache template parser.
+ *
+ * @author  Peter Wall
+ */
 class Parser private constructor(
     private val directoryPath: Path?,
     private val directoryURL: URL,
     val resolvePartial: Parser.(String) -> Reader
 ) {
 
+    /**
+     * Construct a `Parser` with the nominated directory (as a [File]) as the location for partials.
+     */
     constructor(directory: File) : this(directory.toPath(), directory.toURI().toURL(), Parser::defaultResolvePartial)
 
+    /**
+     * Construct a `Parser` with the nominated directory (as a [Path]) as the location for partials.
+     */
     constructor(directoryPath: Path) : this(directoryPath, directoryPath.toUri().toURL(), Parser::defaultResolvePartial)
 
+    /**
+     * Construct a `Parser` with the nominated directory (as a [URL]) as the location for partials.
+     */
     constructor(directoryURL: URL) : this(derivePath(directoryURL), directoryURL, Parser::defaultResolvePartial)
 
+    /**
+     * Construct a `Parser` with a lambda for custom partial resolution.
+     */
     constructor(resolvePartial: Parser.(String) -> Reader = Parser::defaultResolvePartial) :
             this(currentDirectory.toPath(), currentDirectory.toURI().toURL(), resolvePartial)
 
@@ -68,18 +87,39 @@ class Parser private constructor(
             field = trimmedExtension
         }
 
+    var charset: Charset = Charsets.UTF_8
+
     private val partialCache = mutableMapOf<String, Partial>()
 
-    fun parse(inputStream: InputStream): Template {
-        return parse(inputStream.reader())
+    /**
+     * Parse a template from a [File].
+     */
+    fun parse(file: File): Template {
+        return parse(file.inputStream())
     }
 
+    /**
+     * Parse a template from an [InputStream].
+     */
+    fun parse(inputStream: InputStream, charset: Charset = this.charset): Template {
+        return parse(inputStream.reader(charset))
+    }
+
+    /**
+     * Parse a template from a [Reader].
+     */
     fun parse(reader: Reader): Template {
         return Template(parseNested(reader.buffered(), ParseContext()))
     }
 
+    /**
+     * Parse a template from a [String].
+     */
     fun parse(template: String): Template = parse(StringReader(template))
 
+    /**
+     * Parse a named template using the partial resolution mechanism of this `Parser`.
+     */
     fun parseByName(name: String): Template = parse(resolvePartial(name))
 
     private fun parseNested(reader: Reader, context: ParseContext): List<Element> {
@@ -147,20 +187,30 @@ class Parser private constructor(
     }
 
     private fun setDelimiters(tag: String, context: ParseContext): ParseContext {
-        if (tag.endsWith('=') && tag.contains(' ')) {
-            val strippedTag = tag.substring(1, tag.length - 1).trim()
-            val open = strippedTag.substringBefore(' ')
-            val close = strippedTag.substringAfter(' ').trim()
-            if (open.isNotEmpty() && close.isNotEmpty())
-                return context.copy(openDelimiter = open, closeDelimiter = close)
+        val eq = tag.indexOf('=', 1)
+        if (eq == tag.length - 1) {
+            val strippedTag = tag.substring(1, eq)
+            val sp = strippedTag.indexOf(' ')
+            if (sp > 0) {
+                val open = strippedTag.substring(0, sp)
+                val close = strippedTag.substring(sp + 1).trimStart()
+                if (close.isNotEmpty())
+                    return context.copy(openDelimiter = open, closeDelimiter = close)
+            }
         }
         throw MustacheParserException("Incorrect delimiter tag")
     }
 
+    /**
+     * Add a custom Partial.
+     */
     fun addPartial(name: String, partial: Partial) {
         partialCache[name] = partial
     }
 
+    /**
+     * Get a Partial by name.
+     */
     fun getPartial(name: String): Partial {
         partialCache[name]?.let { return it }
         return TemplatePartial().also {
@@ -183,7 +233,7 @@ class Parser private constructor(
 
         val currentDirectory = File(".")
 
-        val extensionRegex = Regex("^[0-9a-zA-Z]+$")
+        val extensionRegex = Regex("^[a-zA-Z0-9][a-zA-Z0-9-+#]*$")
 
         private val fileSystemCache = mutableMapOf<String, FileSystem>()
 
@@ -233,22 +283,5 @@ class Parser private constructor(
         }
 
     }
-
-    // We want a resolvePartial function to take a partial name and resolve it against:
-    // a. a Path representing a directory in a Zip file
-    // b. a Path representing a directory in the main file system
-    // c. an HTML URL
-
-    // Do we need to set the directory? If we take the directory from the initial template file, we can just resolve
-    // peer locations.
-
-    // Probably still good to specify directory, and possibly specify initial template by name (like a partial)
-
-    // Proposal:
-    // Primary constructor takes URL
-    // Secondary constructors take File or Path, and convert it to file: URL
-    // Default constructor equivalent to File(".")
-    // Initialiser takes the URL and creates Path - except in the case of http URL, which leaves Path as null
-    // resolvePartial uses Path.resolveSibling if Path available, otherwise URL.resolve
 
 }

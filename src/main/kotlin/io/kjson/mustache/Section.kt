@@ -28,58 +28,36 @@ package io.kjson.mustache
 import java.math.BigDecimal
 import java.math.BigInteger
 
+import io.kjson.JSONBoolean
+import io.kjson.JSONNumberValue
+
+/**
+ * A  Section element - an element that is processed conditionally depending on the contents of the value.
+ *
+ * @author  Peter Wall
+ */
 class Section(private val name: String, children: List<Element>) : ElementWithChildren(children)  {
 
     override fun appendTo(appendable: Appendable, context: Context) {
-        useValue(context.resolve(name), appendable, context)
-    }
-
-    private fun useValue(value: Any?, appendable: Appendable, context: Context) {
-        when (value) {
+        when (val value = context.resolve(name)) {
             null -> {}
             is Iterable<*> -> iterate(appendable, context, value.iterator())
+            is Sequence<*> -> iterate(appendable, context, value.iterator())
             is Array<*> -> iterate(appendable, context, value.iterator())
+            is Map<*, *> -> iterate(appendable, context, value.entries.iterator())
+            is CharSequence -> if (value.isNotEmpty()) appendChildren(appendable, context.child(value))
+            is Boolean -> if (value) appendChildren(appendable, context.child(value))
+            is Int -> if (value != 0) appendChildren(appendable, context.child(value))
+            is Long -> if (value != 0L) appendChildren(appendable, context.child(value))
+            is Short -> if (value != 0) appendChildren(appendable, context.child(value))
+            is Byte -> if (value != 0) appendChildren(appendable, context.child(value))
+            is Double -> if (value != 0.0) appendChildren(appendable, context.child(value))
+            is Float -> if (value != 0.0F) appendChildren(appendable, context.child(value))
+            is BigInteger -> if (value != BigInteger.ZERO) appendChildren(appendable, context.child(value))
+            is BigDecimal -> if (value.compareTo(BigDecimal.ZERO) != 0) appendChildren(appendable, context.child(value))
+            is JSONNumberValue -> if (value.isNotZero()) appendChildren(appendable, context.child(value))
+            is JSONBoolean -> if (value.value) appendChildren(appendable, context.child(value))
             is Enum<*> -> appendChildren(appendable, context.enumChild(value))
-            is CharSequence -> {
-                if (value.isNotEmpty())
-                    appendChildren(appendable, context.child(value))
-            }
-            is Boolean -> {
-                if (value)
-                    appendChildren(appendable, context.child(value))
-            }
-            is Int -> {
-                if (value != 0)
-                    appendChildren(appendable, context.child(value))
-            }
-            is Long -> {
-                if (value != 0L)
-                    appendChildren(appendable, context.child(value))
-            }
-            is Short -> {
-                if (value != 0)
-                    appendChildren(appendable, context.child(value))
-            }
-            is Byte -> {
-                if (value != 0)
-                    appendChildren(appendable, context.child(value))
-            }
-            is Double -> {
-                if (value != 0.0)
-                    appendChildren(appendable, context.child(value))
-            }
-            is Float -> {
-                if (value != 0.0F)
-                    appendChildren(appendable, context.child(value))
-            }
-            is BigInteger -> {
-                if (value != BigInteger.ZERO)
-                    appendChildren(appendable, context.child(value))
-            }
-            is BigDecimal -> {
-                if (value != BigDecimal.ZERO)
-                    appendChildren(appendable, context.child(value))
-            }
             else -> { // any other types? callable?
                 appendChildren(appendable, context.child(value))
             }

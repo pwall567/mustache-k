@@ -25,6 +25,11 @@
 
 package io.kjson.mustache
 
+/**
+ * A Template Partial that refers to another Template.
+ *
+ * @author  Peter Wall
+ */
 class TemplatePartial : Partial {
 
     internal lateinit var template: Template

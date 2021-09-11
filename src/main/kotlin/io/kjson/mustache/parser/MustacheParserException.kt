@@ -25,4 +25,9 @@
 
 package io.kjson.mustache.parser
 
+/**
+ * Exception thrown by the Mustache parser.
+ *
+ * @author  Peter Wall
+ */
 class MustacheParserException(message: String) : RuntimeException(message)

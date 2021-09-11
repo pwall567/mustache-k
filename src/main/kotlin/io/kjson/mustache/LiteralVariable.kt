@@ -25,6 +25,11 @@
 
 package io.kjson.mustache
 
+/**
+ * A literal Variable template element - outputs a specified value without HTML escaping.
+ *
+ * @author  Peter Wall
+ */
 class LiteralVariable(private val name: String) : Element {
 
     override fun appendTo(appendable: Appendable, context: Context) {

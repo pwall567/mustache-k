@@ -27,6 +27,11 @@ package io.kjson.mustache
 
 import net.pwall.html.HTML
 
+/**
+ * A Variable template element - outputs a specified value escaped for HTML.
+ *
+ * @author  Peter Wall
+ */
 class Variable(private val name: String) : Element {
 
     override fun appendTo(appendable: Appendable, context: Context) {

@@ -25,6 +25,11 @@
 
 package io.kjson.mustache
 
+/**
+ * A text element - text that is copied to the output without modification.
+ *
+ * @author  Peter Wall
+ */
 class TextElement(private val text: String) : Element {
 
     override fun appendTo(appendable: Appendable, context: Context) {

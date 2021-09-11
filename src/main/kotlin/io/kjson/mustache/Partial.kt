@@ -25,4 +25,9 @@
 
 package io.kjson.mustache
 
+/**
+ * An interface for a Template Partial.
+ *
+ * @author  Peter Wall
+ */
 interface Partial : Element

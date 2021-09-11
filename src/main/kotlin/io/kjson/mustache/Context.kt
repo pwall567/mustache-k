@@ -25,33 +25,39 @@
 
 package io.kjson.mustache
 
-import kotlin.reflect.full.memberExtensionProperties
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.staticFunctions
 import kotlin.reflect.full.staticProperties
 
-open class Context private constructor(private val contextObject: Any?, private val parent: Context?) {
+/**
+ * The context for evaluation of a template element.
+ *
+ * @author  Peter Wall
+ */
+open class Context private constructor(val contextObject: Any?, private val parent: Context?) {
 
     constructor(contextObject: Any?) : this(contextObject, null)
 
     open fun resolve(name: String): Any? {
+        val dotIndex = name.indexOf('.')
         return when {
-            name == "." -> contextObject
-            !name.contains('.') -> resolveName(contextObject, name) { parent?.resolve(name) }
+            dotIndex == 0 && name.length == 1 -> contextObject
+            dotIndex < 0 -> resolveName(contextObject, name) { parent?.resolve(name) }
             else -> {
-                val outerName = name.substringBefore('.')
+                val outerName = name.substring(0, dotIndex)
                 val outerObject = resolveName(contextObject, outerName) { parent?.resolve(outerName) }
-                nestedResolve(outerObject, name.substringAfter('.'))
+                nestedResolve(outerObject, name.substring(dotIndex + 1))
             }
         }
     }
 
     private fun nestedResolve(sourceObject: Any?, name: String): Any? {
+        val dotIndex = name.indexOf('.')
         return when {
-            !name.contains('.') -> resolveName(sourceObject, name) { null }
+            dotIndex < 0 -> resolveName(sourceObject, name) { null }
             else -> {
-                val outerObject = resolveName(sourceObject, name.substringBefore('.')) { null }
-                nestedResolve(outerObject, name.substringAfter('.'))
+                val outerObject = resolveName(sourceObject, name.substring(0, dotIndex)) { null }
+                nestedResolve(outerObject, name.substring(dotIndex + 1))
             }
         }
     }
@@ -66,7 +72,6 @@ open class Context private constructor(private val contextObject: Any?, private 
             else -> {
                 val kClass = sourceObject::class
                 kClass.memberProperties.find { it.name == name }?.let { return it.call(sourceObject) }
-                kClass.memberExtensionProperties.find { it.name == name }?.let { return it.call(sourceObject) }
                 kClass.staticProperties.find { it.name == name }?.let { return it.call() }
             }
         }
@@ -77,21 +82,19 @@ open class Context private constructor(private val contextObject: Any?, private 
 
     fun iteratorChild(contextObject: Any?, first: Boolean, last: Boolean, index: Int, index1: Int) =
         object : Context(contextObject, this) {
-            override fun resolve(name: String): Any? {
-                return when (name) {
-                    "first" -> first
-                    "last" -> last
-                    "index" -> index
-                    "index1" -> index1
-                    else -> super.resolve(name)
-                }
+            override fun resolve(name: String): Any? = when (name) {
+                "first" -> first
+                "last" -> last
+                "index" -> index
+                "index1" -> index1
+                else -> super.resolve(name)
             }
         }
 
     @Suppress("UNCHECKED_CAST")
     fun enumChild(contextObject: Enum<*>) = object : Context(contextObject, this) {
         val values = (contextObject::class.staticFunctions.find { it.name == "values" }?.call() as? Array<Enum<*>>?)?.
-        map { it.name }
+                map { it.name }
         override fun resolve(name: String): Any? {
             if (contextObject.name == name)
                 return true

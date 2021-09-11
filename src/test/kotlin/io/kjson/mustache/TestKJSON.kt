@@ -1,8 +1,8 @@
 /*
- * @(#) ElementWithChildren.kt
+ * @(#) TestKJSON.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2021 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,16 +25,27 @@
 
 package io.kjson.mustache
 
-/**
- * Abstract base class for template elements with children.
- *
- * @author  Peter Wall
- */
-abstract class ElementWithChildren(private val children: List<Element>) : Element {
+import kotlin.test.Test
+import kotlin.test.expect
 
-    fun appendChildren(appendable: Appendable, context: Context) {
-        for (child in children)
-            child.appendTo(appendable, context)
+import io.kjson.JSON
+
+class TestKJSON {
+
+    @Test fun `should work with KJSON`() {
+        val json = JSON.parse("""{"a":"X","b":23,"c":true,"d":false,"e":[1,2,3],"f":"","g":0}""")
+        val template1 = Template.parse("a={{&a}}, b={{&b}}, c={{#c}}true{{/c}}{{^c}}false{{/c}}")
+        expect("a=X, b=23, c=true") { template1.render(json) }
+        val template2 = Template.parse("c={{#c}}true{{/c}}{{^c}}false{{/c}}, d={{#d}}true{{/d}}{{^d}}false{{/d}}")
+        expect("c=true, d=false") { template2.render(json) }
+        val template3 = Template.parse("-{{#e}}{{.}};{{/e}}-")
+        expect("-1;2;3;-") { template3.render(json) }
+        val template4 = Template.parse("{{^f}}OK{{/f}}")
+        expect("OK") { template4.render(json) }
+        val template5 = Template.parse("{{^g}}OK{{/g}}")
+        expect("OK") { template5.render(json) }
+        val template6 = Template.parse("#{{#g}}OK{{/g}}#")
+        expect("##") { template6.render(json) }
     }
 
 }

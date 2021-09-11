@@ -25,9 +25,18 @@
 
 package io.kjson.mustache
 
+import java.io.File
+import java.io.InputStream
 import java.io.Reader
+import java.nio.charset.Charset
+
 import io.kjson.mustache.parser.Parser
 
+/**
+ * A Mustache template.
+ *
+ * @author  Peter Wall
+ */
 class Template internal constructor(children: List<Element>): ElementWithChildren(children) {
 
     override fun appendTo(appendable: Appendable, context: Context) {
@@ -48,7 +57,13 @@ class Template internal constructor(children: List<Element>): ElementWithChildre
             Parser()
         }
 
+        fun parse(file: File): Template = Parser(file.parentFile).parse(file)
+
+        fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8) = parser.parse(inputStream, charset)
+
         fun parse(reader: Reader) = parser.parse(reader)
+
+        fun parse(template: String) = parser.parse(template)
 
     }
 

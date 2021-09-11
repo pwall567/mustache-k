@@ -25,55 +25,39 @@
 
 package io.kjson.mustache
 
+import java.math.BigDecimal
+import java.math.BigInteger
+
+import io.kjson.JSONBoolean
+import io.kjson.JSONNumberValue
+
+/**
+ * An Inverted Section element - an element that is processed only if the value is false, or empty , or zero.
+ *
+ * @author  Peter Wall
+ */
 class InvertedSection(private val name: String, children: List<Element>) : ElementWithChildren(children) {
 
     override fun appendTo(appendable: Appendable, context: Context) {
-        context.resolve(name).let {
-            when (it) {
-                null -> {
-                    appendChildren(appendable, context)
-                }
-                is List<*> -> {
-                    if (it.isEmpty())
-                        appendChildren(appendable, context)
-                }
-                is Iterable<*> -> {
-                    if (!it.iterator().hasNext())
-                        appendChildren(appendable, context)
-                }
-                is Array<*> -> {
-                    if (it.isEmpty())
-                        appendChildren(appendable, context)
-                }
-                is Map<*, *> -> {
-                    if (it.isEmpty())
-                        appendChildren(appendable, context)
-                }
-                is CharSequence -> {
-                    if (it.isEmpty())
-                        appendChildren(appendable, context)
-                }
-                is Boolean -> {
-                    if (!it)
-                        appendChildren(appendable, context)
-                }
-                is Int -> {
-                    if (it == 0)
-                        appendChildren(appendable, context)
-                }
-                is Long -> {
-                    if (it == 0)
-                        appendChildren(appendable, context)
-                }
-                is Short -> {
-                    if (it == 0)
-                        appendChildren(appendable, context)
-                }
-                is Byte -> {
-                    if (it == 0)
-                        appendChildren(appendable, context)
-                }
-            }
+        when (val value = context.resolve(name)) {
+            null -> appendChildren(appendable, context)
+            is List<*> -> if (value.isEmpty()) appendChildren(appendable, context)
+            is Array<*> -> if (value.isEmpty()) appendChildren(appendable, context)
+            is Map<*, *> -> if (value.isEmpty()) appendChildren(appendable, context)
+            is CharSequence -> if (value.isEmpty()) appendChildren(appendable, context)
+            is Iterable<*> -> if (!value.iterator().hasNext()) appendChildren(appendable, context)
+            is Sequence<*> -> if (!value.iterator().hasNext()) appendChildren(appendable, context)
+            is Boolean -> if (!value) appendChildren(appendable, context)
+            is Int -> if (value == 0) appendChildren(appendable, context)
+            is Long -> if (value == 0) appendChildren(appendable, context)
+            is Short -> if (value == 0) appendChildren(appendable, context)
+            is Byte -> if (value == 0) appendChildren(appendable, context)
+            is Double -> if (value == 0.0) appendChildren(appendable, context)
+            is Float -> if (value == 0.0F) appendChildren(appendable, context)
+            is BigInteger -> if (value == BigInteger.ZERO) appendChildren(appendable, context)
+            is BigDecimal -> if (value.compareTo(BigDecimal.ZERO) == 0) appendChildren(appendable, context)
+            is JSONNumberValue -> if (value.isZero()) appendChildren(appendable, context)
+            is JSONBoolean -> if (!value.value) appendChildren(appendable, context)
         }
     }
 

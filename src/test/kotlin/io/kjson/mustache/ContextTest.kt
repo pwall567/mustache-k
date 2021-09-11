@@ -1,5 +1,5 @@
 /*
- * @(#) ElementWithChildren.kt
+ * @(#) ContextTest.kt
  *
  * mustache-k  Mustache template processor for Kotlin
  * Copyright (c) 2020, 2021 Peter Wall
@@ -25,16 +25,23 @@
 
 package io.kjson.mustache
 
-/**
- * Abstract base class for template elements with children.
- *
- * @author  Peter Wall
- */
-abstract class ElementWithChildren(private val children: List<Element>) : Element {
+import kotlin.test.Test
+import kotlin.test.expect
 
-    fun appendChildren(appendable: Appendable, context: Context) {
-        for (child in children)
-            child.appendTo(appendable, context)
+class ContextTest {
+
+    @Test fun `should retrieve property from map`() {
+        val testMap = mapOf("aaa" to "Hello", "bbb" to "World")
+        val context = Context(testMap)
+        expect("Hello") { context.resolve("aaa") }
+        expect("World") { context.resolve("bbb") }
+    }
+
+    @Test fun `should retrieve property from data class`() {
+        val testClass = TestClass("Hello", "World")
+        val context = Context(testClass)
+        expect("Hello") { context.resolve("aaa") }
+        expect("World") { context.resolve("bbb") }
     }
 
 }

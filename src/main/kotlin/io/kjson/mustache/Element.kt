@@ -25,8 +25,16 @@
 
 package io.kjson.mustache
 
+/**
+ * A Mustache template element (a Variable, Section _etc._)
+ *
+ * @author  Peter Wall
+ */
 sealed interface Element {
 
+    /**
+     * Append the result of this element (when evaluated against a specified [Context]) to an [Appendable].
+     */
     fun appendTo(appendable: Appendable, context: Context)
 
 }

@@ -25,6 +25,11 @@
 
 package io.kjson.mustache.parser
 
+/**
+ * The current parse context - the delimiters currently in effect and the current section.
+ *
+ * @author  Peter Wall
+ */
 data class ParseContext(
     val openDelimiter: String = "{{",
     val closeDelimiter: String = "}}",
