@@ -1,8 +1,8 @@
 /*
- * @(#) Variable.kt
+ * @(#) MustacheLoader.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2021 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,22 +23,27 @@
  * SOFTWARE.
  */
 
-package io.kjson.mustache
+package io.kjson.mustache.parser
 
-import net.pwall.pipeline.AppendableAcceptor
-import net.pwall.pipeline.html.HTMLEncoder
+import java.net.URL
+import java.nio.file.Path
+import io.kjson.mustache.Template
+import io.kjson.resource.ResourceDescriptor
+import io.kjson.resource.ResourceLoader
 
-/**
- * A Variable template element - outputs a specified value escaped for HTML.
- *
- * @author  Peter Wall
- */
-class Variable(private val name: String) : Element {
+class MustacheLoader(
+    directoryPath: Path?,
+    directoryURL: URL,
+    private val parser: Parser,
+) : ResourceLoader<Template, MustacheLoader>(directoryPath, directoryURL) {
 
-    override fun appendTo(appendable: Appendable, context: Context) {
-        context.resolve(name)?.let {
-            HTMLEncoder<Unit>(AppendableAcceptor(appendable)).accept(it.toString())
-        }
+    override var defaultExtension: String? = "mustache"
+
+    override fun load(rd: ResourceDescriptor): Template {
+        return parser.parse(rd.getReader())
     }
+
+    override fun resolvedLoader(resourcePath: Path?, resourceURL: URL) =
+            MustacheLoader(resourcePath, resourceURL, parser).also { it.defaultExtension = defaultExtension }
 
 }

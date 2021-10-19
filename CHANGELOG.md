@@ -2,6 +2,13 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.1] - 2021-10-19
+### Changed
+- `Variable`: switched HTML encoding to use `pipelines` library
+- `Parser`: switched to use `resource-loader`
+### Added
+- `MustacheLoader`: new
+
 ## [1.0] - 2021-09-11
 ### Changed
 - many files: added KDoc

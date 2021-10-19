@@ -98,14 +98,14 @@ class TemplateParserTest {
 
     @Test fun `should locate partial using supplied directory and extension`() {
         val parser = Parser(File("src/test/resources/templates"))
-        parser.extension = "hbs"
+        parser.defaultExtension = "hbs"
         val template = parser.parse("{{#list}}{{>list_item}}{{/list}}")
         val data = mapOf("list" to listOf("abc", "def", "ghi"))
         expect("abc,\ndef,\nghi\n") { template.render(data) }
     }
 
     @Test fun `should locate partial using custom resolver`() {
-        val parser = Parser { File("src/test/resources/templates", "$it.hbs").reader() }
+        val parser = Parser { parse(File("src/test/resources/templates", "$it.hbs").reader()) }
         val template = parser.parse("{{#list}}{{>list_item}}{{/list}}")
         val data = mapOf("list" to listOf("abc", "def", "ghi"))
         expect("abc,\ndef,\nghi\n") { template.render(data) }

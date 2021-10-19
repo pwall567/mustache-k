@@ -68,17 +68,17 @@ class ParserTest {
     @Test fun `should create Parser with custom resolver`() {
         val parser = Parser { name ->
             when (name) {
-                "dummy" -> File("src/test/resources/templates/dummy.mustache").reader()
+                "substitute" -> parse(File("src/test/resources/templates/dummy.mustache").reader())
                 else -> fail("Can't resolve name - $name")
             }
         }
-        val template = parser.parseByName("dummy")
+        val template = parser.parseByName("substitute")
         expect("Dummy template\n") { template.render() }
     }
 
     @Test fun `should use custom extension`() {
         val parser = Parser(ParserTest::class.java.getResource("/templates") ?: fail("templates not found"))
-        parser.extension = "hbs"
+        parser.defaultExtension = "hbs"
         val template = parser.parseByName("dummy")
         expect("Dummy handlebars\n") { template.render() }
     }
@@ -114,6 +114,30 @@ class ParserTest {
         parser.addPartial("extra", parser.getPartial("dummy"))
         val template = parser.parse("{{>extra}}")
         expect("Dummy template\n") { template.render() }
+    }
+
+    @Test fun `should use second resource directory - File`() {
+        val parser = Parser(File("src/test/resources/templates"))
+        val data = mapOf("list" to listOf(listOf("world", "moon"), listOf("venus", "mars")))
+        expect("[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
+        parser.addLoader(File("src/test/resources/templates2"))
+        expect("2:[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
+    }
+
+    @Test fun `should use second resource directory - Path`() {
+        val parser = Parser(FileSystems.getDefault().getPath("src/test/resources/templates"))
+        val data = mapOf("list" to listOf(listOf("world", "moon"), listOf("venus", "mars")))
+        expect("[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
+        parser.addLoader(FileSystems.getDefault().getPath("src/test/resources/templates2"))
+        expect("2:[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
+    }
+
+    @Test fun `should use second resource directory - url`() {
+        val parser = Parser(ParserTest::class.java.getResource("/templates") ?: fail("templates not found"))
+        val data = mapOf("list" to listOf(listOf("world", "moon"), listOf("venus", "mars")))
+        expect("[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
+        parser.addLoader(ParserTest::class.java.getResource("/templates2") ?: fail("templates2 not found"))
+        expect("2:[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
     }
 
 }

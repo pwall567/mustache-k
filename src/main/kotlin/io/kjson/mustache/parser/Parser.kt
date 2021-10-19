@@ -31,11 +31,7 @@ import java.io.Reader
 import java.io.StringReader
 import java.net.URL
 import java.nio.charset.Charset
-import java.nio.file.FileSystem
-import java.nio.file.FileSystems
-import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 import io.kjson.mustache.Element
 import io.kjson.mustache.InvertedSection
@@ -46,6 +42,9 @@ import io.kjson.mustache.Template
 import io.kjson.mustache.TemplatePartial
 import io.kjson.mustache.TextElement
 import io.kjson.mustache.Variable
+import io.kjson.resource.ResourceLoader.Companion.derivePath
+import io.kjson.resource.ResourceNotFoundException
+import net.pwall.pipeline.codec.DynamicReader
 
 /**
  * Mustache template parser.
@@ -53,74 +52,85 @@ import io.kjson.mustache.Variable
  * @author  Peter Wall
  */
 class Parser private constructor(
-    private val directoryPath: Path?,
-    private val directoryURL: URL,
-    val resolvePartial: Parser.(String) -> Reader
+    directoryPath: Path?,
+    directoryURL: URL,
+    private val partialCache: MutableMap<String, Partial> = mutableMapOf(),
+    val resolver: Parser.(String) -> Template = Parser::defaultResolver,
 ) {
 
-    /**
-     * Construct a `Parser` with the nominated directory (as a [File]) as the location for partials.
-     */
-    constructor(directory: File) : this(directory.toPath(), directory.toURI().toURL(), Parser::defaultResolvePartial)
+    private val loaders = mutableListOf(MustacheLoader(directoryPath, directoryURL, this))
 
     /**
-     * Construct a `Parser` with the nominated directory (as a [Path]) as the location for partials.
+     * Construct a `Parser` with the nominated directory (as a [File]) as the location for templates.
      */
-    constructor(directoryPath: Path) : this(directoryPath, directoryPath.toUri().toURL(), Parser::defaultResolvePartial)
+    constructor(directory: File) : this(directory.toPath(), directory.toURI().toURL())
 
     /**
-     * Construct a `Parser` with the nominated directory (as a [URL]) as the location for partials.
+     * Construct a `Parser` with the nominated directory (as a [Path]) as the location for templates.
      */
-    constructor(directoryURL: URL) : this(derivePath(directoryURL), directoryURL, Parser::defaultResolvePartial)
+    constructor(directoryPath: Path) : this(directoryPath, directoryPath.toUri().toURL())
+
+    /**
+     * Construct a `Parser` with the nominated directory (as a [URL]) as the location for templates.
+     */
+    constructor(directoryURL: URL) : this(derivePath(directoryURL), directoryURL)
 
     /**
      * Construct a `Parser` with a lambda for custom partial resolution.
      */
-    constructor(resolvePartial: Parser.(String) -> Reader = Parser::defaultResolvePartial) :
-            this(currentDirectory.toPath(), currentDirectory.toURI().toURL(), resolvePartial)
+    constructor(resolver: Parser.(String) -> Template = Parser::defaultResolver) :
+            this(currentDirectory.toPath(), currentDirectory.toURI().toURL(), resolver = resolver)
 
-    var extension = defaultExtension
+    /** The default extension (initialised to `mustache`) */
+    var defaultExtension = standardDefaultExtension
         set(newExtension) {
             val trimmedExtension = if (newExtension.startsWith('.')) newExtension.drop(1) else newExtension
             if (!extensionRegex.containsMatchIn(trimmedExtension))
                 throw MustacheParserException("Invalid extension - $trimmedExtension")
             field = trimmedExtension
+            for (loader in loaders)
+                loader.defaultExtension = trimmedExtension
         }
 
-    var charset: Charset = Charsets.UTF_8
+    /** The `Charset` to be used to read templates (if `null`, the character set will be determined dynamically) */
+    var charset: Charset? = null
 
-    private val partialCache = mutableMapOf<String, Partial>()
+    fun addLoader(directory: File) {
+        loaders.add(0, MustacheLoader(directory.toPath(), directory.toURI().toURL(), this).also { it.defaultExtension = defaultExtension })
+    }
+
+    fun addLoader(directoryPath: Path) {
+        loaders.add(0, MustacheLoader(directoryPath, directoryPath.toUri().toURL(), this).also { it.defaultExtension = defaultExtension })
+    }
+
+    fun addLoader(directoryURL: URL) {
+        loaders.add(0, MustacheLoader(derivePath(directoryURL), directoryURL, this).also { it.defaultExtension = defaultExtension })
+    }
 
     /**
      * Parse a template from a [File].
      */
-    fun parse(file: File): Template {
-        return parse(file.inputStream())
-    }
+    fun parse(file: File) = parse(file.inputStream())
 
     /**
-     * Parse a template from an [InputStream].
+     * Parse a template from an [InputStream] with an optional [Charset].
      */
-    fun parse(inputStream: InputStream, charset: Charset = this.charset): Template {
-        return parse(inputStream.reader(charset))
-    }
+    fun parse(inputStream: InputStream, charset: Charset? = this.charset) = parse(DynamicReader(inputStream, charset))
 
     /**
      * Parse a template from a [Reader].
      */
-    fun parse(reader: Reader): Template {
-        return Template(parseNested(reader.buffered(), ParseContext()))
-    }
+    fun parse(reader: Reader) = Template(parseNested(reader.buffered(), ParseContext()))
 
     /**
      * Parse a template from a [String].
      */
-    fun parse(template: String): Template = parse(StringReader(template))
+    fun parse(template: String) = parse(StringReader(template))
 
     /**
      * Parse a named template using the partial resolution mechanism of this `Parser`.
      */
-    fun parseByName(name: String): Template = parse(resolvePartial(name))
+    fun parseByName(name: String) = resolver(name)
 
     private fun parseNested(reader: Reader, context: ParseContext): List<Element> {
         var currentContext = context
@@ -215,43 +225,28 @@ class Parser private constructor(
         partialCache[name]?.let { return it }
         return TemplatePartial().also {
             partialCache[name] = it
-            it.template = parse(resolvePartial(name))
+            it.template = resolver(name)
         }
     }
 
-    private fun defaultResolvePartial(name: String): Reader {
-        val extendedName = "$name.$extension"
-        directoryPath?.let { path ->
-            return Files.newBufferedReader(path.resolve(extendedName))
+    private fun defaultResolver(name: String): Template {
+        for (loader in loaders) {
+            try {
+                return loader.load(name)
+            }
+            catch (_: ResourceNotFoundException) { // do nothing
+            }
         }
-        return directoryURL.toURI().resolve(extendedName).toURL().openStream().reader()
+        throw MustacheParserException("Can't locate template - $name")
     }
 
     companion object {
 
-        const val defaultExtension = "mustache"
+        const val standardDefaultExtension = "mustache"
 
         val currentDirectory = File(".")
 
         val extensionRegex = Regex("^[a-zA-Z0-9][a-zA-Z0-9-+#]*$")
-
-        private val fileSystemCache = mutableMapOf<String, FileSystem>()
-
-        fun derivePath(url: URL): Path? {
-            val uri = url.toURI()
-            return when (uri.scheme) {
-                "jar" -> {
-                    val schemeSpecific = uri.schemeSpecificPart
-                    val jarName = schemeSpecific.substringAfter(':').substringBefore('!')
-                    val fs = fileSystemCache[jarName] ?: FileSystems.newFileSystem(Paths.get(jarName), null).also {
-                        fileSystemCache[jarName] = it
-                    }
-                    fs.getPath(schemeSpecific.substringAfter('!'))
-                }
-                "file" -> FileSystems.getDefault().getPath(uri.path)
-                else -> null
-            }
-        }
 
         fun Reader.readUntilDelimiter(delimiter: String, sb: StringBuilder): Boolean {
             val n = delimiter.length - 1

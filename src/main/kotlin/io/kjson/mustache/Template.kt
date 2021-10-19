@@ -59,7 +59,7 @@ class Template internal constructor(children: List<Element>): ElementWithChildre
 
         fun parse(file: File): Template = Parser(file.parentFile).parse(file)
 
-        fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8) = parser.parse(inputStream, charset)
+        fun parse(inputStream: InputStream, charset: Charset? = null) = parser.parse(inputStream, charset)
 
         fun parse(reader: Reader) = parser.parse(reader)
 
