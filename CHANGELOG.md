@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.2] - 2022-01-27
+### Changed
+- `pom.xml`: bumped dependency versions, switched to Kotlin 1.6.10
+
 ## [1.1] - 2021-10-19
 ### Changed
 - `Variable`: switched HTML encoding to use `pipelines` library
