@@ -29,7 +29,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 import io.kjson.JSONBoolean
-import io.kjson.JSONNumberValue
+import io.kjson.JSONNumber
 
 /**
  * A  Section element - an element that is processed conditionally depending on the contents of the value.
@@ -49,13 +49,13 @@ class Section(private val name: String, children: List<Element>) : ElementWithCh
             is Boolean -> if (value) appendChildren(appendable, context.child(value))
             is Int -> if (value != 0) appendChildren(appendable, context.child(value))
             is Long -> if (value != 0L) appendChildren(appendable, context.child(value))
-            is Short -> if (value != 0) appendChildren(appendable, context.child(value))
-            is Byte -> if (value != 0) appendChildren(appendable, context.child(value))
+            is Short -> if (value != 0.toShort()) appendChildren(appendable, context.child(value))
+            is Byte -> if (value != 0.toByte()) appendChildren(appendable, context.child(value))
             is Double -> if (value != 0.0) appendChildren(appendable, context.child(value))
             is Float -> if (value != 0.0F) appendChildren(appendable, context.child(value))
             is BigInteger -> if (value != BigInteger.ZERO) appendChildren(appendable, context.child(value))
             is BigDecimal -> if (value.compareTo(BigDecimal.ZERO) != 0) appendChildren(appendable, context.child(value))
-            is JSONNumberValue -> if (value.isNotZero()) appendChildren(appendable, context.child(value))
+            is JSONNumber -> if (value.isNotZero()) appendChildren(appendable, context.child(value))
             is JSONBoolean -> if (value.value) appendChildren(appendable, context.child(value))
             is Enum<*> -> appendChildren(appendable, context.enumChild(value))
             else -> { // any other types? callable?

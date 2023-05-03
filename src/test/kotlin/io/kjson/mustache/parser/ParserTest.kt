@@ -28,8 +28,8 @@ package io.kjson.mustache.parser
 import kotlin.test.Test
 import kotlin.test.expect
 import kotlin.test.fail
-import java.io.ByteArrayInputStream
 
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.net.URL
 import java.nio.file.FileSystems

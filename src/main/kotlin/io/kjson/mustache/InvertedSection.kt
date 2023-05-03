@@ -29,7 +29,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 import io.kjson.JSONBoolean
-import io.kjson.JSONNumberValue
+import io.kjson.JSONNumber
 
 /**
  * An Inverted Section element - an element that is processed only if the value is false, or empty , or zero.
@@ -56,7 +56,7 @@ class InvertedSection(private val name: String, children: List<Element>) : Eleme
             is Float -> if (value == 0.0F) appendChildren(appendable, context)
             is BigInteger -> if (value == BigInteger.ZERO) appendChildren(appendable, context)
             is BigDecimal -> if (value.compareTo(BigDecimal.ZERO) == 0) appendChildren(appendable, context)
-            is JSONNumberValue -> if (value.isZero()) appendChildren(appendable, context)
+            is JSONNumber -> if (value.isZero()) appendChildren(appendable, context)
             is JSONBoolean -> if (!value.value) appendChildren(appendable, context)
         }
     }
