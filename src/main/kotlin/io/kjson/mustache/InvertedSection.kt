@@ -2,7 +2,7 @@
  * @(#) InvertedSection.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ import java.math.BigInteger
 
 import io.kjson.JSONBoolean
 import io.kjson.JSONNumber
+import net.pwall.util.CoOutput
 
 /**
  * An Inverted Section element - an element that is processed only if the value is false, or empty , or zero.
@@ -62,6 +63,33 @@ class InvertedSection(private val name: String, children: List<Element>) : Eleme
             is BigDecimal -> if (value.compareTo(BigDecimal.ZERO) == 0) appendChildren(appendable, context)
             is JSONNumber -> if (value.isZero()) appendChildren(appendable, context)
             is JSONBoolean -> if (!value.value) appendChildren(appendable, context)
+        }
+    }
+
+    override suspend fun outputTo(out: CoOutput, context: Context) {
+        when (val value = context.resolve(name)) {
+            null -> outputChildren(out, context)
+            is List<*> -> if (value.isEmpty()) outputChildren(out, context)
+            is Array<*> -> if (value.isEmpty()) outputChildren(out, context)
+            is Map<*, *> -> if (value.isEmpty()) outputChildren(out, context)
+            is CharSequence -> if (value.isEmpty()) outputChildren(out, context)
+            is Iterable<*> -> if (!value.iterator().hasNext()) outputChildren(out, context)
+            is Sequence<*> -> if (!value.iterator().hasNext()) outputChildren(out, context)
+            is Boolean -> if (!value) outputChildren(out, context)
+            is Int -> if (value == 0) outputChildren(out, context)
+            is Long -> if (value == 0L) outputChildren(out, context)
+            is Short -> if (value == 0.toShort()) outputChildren(out, context)
+            is Byte -> if (value == 0.toByte()) outputChildren(out, context)
+            is UInt -> if (value == 0U) outputChildren(out, context)
+            is ULong -> if (value == 0UL) outputChildren(out, context)
+            is UShort -> if (value == 0.toUShort()) outputChildren(out, context)
+            is UByte -> if (value == 0.toUByte()) outputChildren(out, context)
+            is Double -> if (value == 0.0) outputChildren(out, context)
+            is Float -> if (value == 0.0F) outputChildren(out, context)
+            is BigInteger -> if (value == BigInteger.ZERO) outputChildren(out, context)
+            is BigDecimal -> if (value.compareTo(BigDecimal.ZERO) == 0) outputChildren(out, context)
+            is JSONNumber -> if (value.isZero()) outputChildren(out, context)
+            is JSONBoolean -> if (!value.value) outputChildren(out, context)
         }
     }
 

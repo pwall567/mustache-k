@@ -146,6 +146,11 @@ intermediate output object):
     template.renderTo(appendable, contextObject)
 ```
 
+And from version 1.4, you can render to a non-blocking data stream:
+```kotlin
+    template.coRender(contextObject) { /* output to non-blocking channel */ }
+```
+
 The `Template` companion object also has functions to simplify template parsing, avoiding the need to create a `Parser`.
 To parse a template from a `String`:
 ```kotlin
@@ -338,25 +343,25 @@ For example:
 
 ## Dependency Specification
 
-The latest version of the library is 1.3, and it may be obtained from the Maven Central repository.
+The latest version of the library is 1.4, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>io.kjson</groupId>
       <artifactId>mustache-k</artifactId>
-      <version>1.3</version>
+      <version>1.4</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'io.kjson:mustache-k:1.3'
+    implementation 'io.kjson:mustache-k:1.4'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("io.kjson:mustache-k:1.3")
+    implementation("io.kjson:mustache-k:1.4")
 ```
 
 Peter Wall
 
-2022-01-28
+2023-05-04

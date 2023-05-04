@@ -36,6 +36,7 @@ import java.nio.file.FileSystems
 
 import io.kjson.mustache.Context
 import io.kjson.mustache.Partial
+import net.pwall.util.CoOutput
 import net.pwall.util.IntOutput
 
 class ParserTest {
@@ -103,6 +104,9 @@ class ParserTest {
                     appendable.append('.')
                     IntOutput.append2Digits(appendable, cents)
                 } ?: appendable.append("**ERROR**")
+            }
+            override suspend fun outputTo(out: CoOutput, context: Context) {
+                throw NotImplementedError()
             }
         })
         val template = parser.parse("{{>money}}")

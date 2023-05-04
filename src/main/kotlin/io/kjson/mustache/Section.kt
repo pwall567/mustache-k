@@ -2,7 +2,7 @@
  * @(#) Section.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,16 @@
 
 package io.kjson.mustache
 
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+
 import java.math.BigDecimal
 import java.math.BigInteger
 
 import io.kjson.JSONBoolean
 import io.kjson.JSONNumber
+import net.pwall.util.CoOutput
+import net.pwall.util.CoOutputFlushable
 
 /**
  * A  Section element - an element that is processed conditionally depending on the contents of the value.
@@ -68,12 +73,78 @@ class Section(private val name: String, children: List<Element>) : ElementWithCh
         }
     }
 
+    override suspend fun outputTo(out: CoOutput, context: Context) {
+        when (val value = context.resolve(name)) {
+            null -> {}
+            is Flow<*> -> iterateOverFlow(out, context, value)
+            is Channel<*> -> iterateOverChannel(out, context, value)
+            is Iterable<*> -> iterate(out, context, value.iterator())
+            is Sequence<*> -> iterate(out, context, value.iterator())
+            is Array<*> -> iterate(out, context, value.iterator())
+            is Map<*, *> -> iterate(out, context, value.entries.iterator())
+            is CharSequence -> if (value.isNotEmpty()) outputChildren(out, context.child(value))
+            is Boolean -> if (value) outputChildren(out, context.child(value))
+            is Int -> if (value != 0) outputChildren(out, context.child(value))
+            is Long -> if (value != 0L) outputChildren(out, context.child(value))
+            is Short -> if (value != 0.toShort()) outputChildren(out, context.child(value))
+            is Byte -> if (value != 0.toByte()) outputChildren(out, context.child(value))
+            is UInt -> if (value != 0U) outputChildren(out, context.child(value))
+            is ULong -> if (value != 0UL) outputChildren(out, context.child(value))
+            is UShort -> if (value != 0.toUShort()) outputChildren(out, context.child(value))
+            is UByte -> if (value != 0.toUByte()) outputChildren(out, context.child(value))
+            is Double -> if (value != 0.0) outputChildren(out, context.child(value))
+            is Float -> if (value != 0.0F) outputChildren(out, context.child(value))
+            is BigInteger -> if (value != BigInteger.ZERO) outputChildren(out, context.child(value))
+            is BigDecimal -> if (value.compareTo(BigDecimal.ZERO) != 0) outputChildren(out, context.child(value))
+            is JSONNumber -> if (value.isNotZero()) outputChildren(out, context.child(value))
+            is JSONBoolean -> if (value.value) outputChildren(out, context.child(value))
+            is Enum<*> -> outputChildren(out, context.enumChild(value))
+            else -> { // any other types? callable?
+                outputChildren(out, context.child(value))
+            }
+        }
+    }
+
     private fun iterate(appendable: Appendable, context: Context, iterator: Iterator<*>) {
         var index = 0
         while (iterator.hasNext()) {
             val item = iterator.next()
             val iteratorContext = context.iteratorChild(item, index == 0, !iterator.hasNext(), index, index + 1)
             appendChildren(appendable, iteratorContext)
+            index++
+        }
+    }
+
+    private suspend fun iterate(out: CoOutput, context: Context, iterator: Iterator<*>) {
+        var index = 0
+        while (iterator.hasNext()) {
+            val item = iterator.next()
+            val iteratorContext = context.iteratorChild(item, index == 0, !iterator.hasNext(), index, index + 1)
+            outputChildren(out, iteratorContext)
+            index++
+        }
+    }
+
+    private suspend fun iterateOverFlow(out: CoOutput, context: Context, flow: Flow<*>) {
+        var index = 0
+        flow.collect {
+            val flowContext = context.iteratorChild(it, index == 0, false, index, index + 1)
+            outputChildren(out, flowContext)
+            if (out is CoOutputFlushable)
+                out.flush()
+            index++
+        }
+    }
+
+    private suspend fun iterateOverChannel(out: CoOutput, context: Context, channel: Channel<*>) {
+        val iterator = channel.iterator()
+        var index = 0
+        while (iterator.hasNext()) {
+            val item = iterator.next()
+            val channelContext = context.iteratorChild(item, index == 0, false, index, index + 1)
+            outputChildren(out, channelContext)
+            if (out is CoOutputFlushable)
+                out.flush()
             index++
         }
     }

@@ -2,10 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
-## [Unreleased]
+## [1.4] - 2023-05-04
 ### Changed
 - `pom.xml`: updated dependencies, updated Kotlin version to 1.7.21
 - `Section`, `InvertedSection`: added coverage of unsigned numbers
+- several classes: added non-blocking output
 
 ## [1.3] - 2022-01-28
 ### Changed

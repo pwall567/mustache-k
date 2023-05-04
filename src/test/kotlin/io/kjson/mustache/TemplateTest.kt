@@ -27,6 +27,10 @@ package io.kjson.mustache
 
 import kotlin.test.Test
 import kotlin.test.expect
+import kotlinx.coroutines.runBlocking
+
+import net.pwall.util.CoOutput
+import net.pwall.util.output
 
 class TemplateTest {
 
@@ -85,6 +89,43 @@ class TemplateTest {
         val stringBuilder = StringBuilder()
         template.renderTo(stringBuilder)
         expect("hello") { stringBuilder.toString() }
+    }
+
+    @Test fun `should output to CoOutput`() = runBlocking {
+        val template = Template(listOf(TextElement("hello")))
+        val coCapture = CoCapture()
+        template.coRender { coCapture.output(it) }
+        expect("hello") { coCapture.toString() }
+    }
+
+    @Test fun `should output list to CoOutput`() = runBlocking {
+        val section = Section("items", listOf(TextElement(" hello, "), Variable("aaa"), TextElement(";")))
+        val template = Template(listOf(TextElement("data:"), section))
+        val data = mapOf("items" to listOf(TestClass("world"), TestClass("moon")))
+        val coCapture = CoCapture()
+        template.coRender(data) { coCapture.output(it) }
+        expect("data: hello, world; hello, moon;") { coCapture.toString() }
+    }
+
+    @Test fun `should output to CoOutput with HTML escaping`() = runBlocking {
+        val template = Template(listOf(TextElement("hello, "), Variable("aaa")))
+        val data = TestClass("<world>")
+        val coCapture = CoCapture()
+        template.coRender(data, coCapture)
+        expect("hello, &lt;world&gt;") { coCapture.toString() }
+    }
+
+    class CoCapture(size: Int = 256) : CoOutput {
+
+        private val array = CharArray(size)
+        private var index = 0
+
+        override suspend fun invoke(ch: Char) {
+            array[index++] = ch
+        }
+
+        override fun toString() = String(array, 0, index)
+
     }
 
 }

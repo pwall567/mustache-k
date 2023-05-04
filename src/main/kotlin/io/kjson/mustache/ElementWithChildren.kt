@@ -2,7 +2,7 @@
  * @(#) ElementWithChildren.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,8 @@
 
 package io.kjson.mustache
 
+import net.pwall.util.CoOutput
+
 /**
  * Abstract base class for template elements with children.
  *
@@ -35,6 +37,11 @@ abstract class ElementWithChildren(private val children: List<Element>) : Elemen
     fun appendChildren(appendable: Appendable, context: Context) {
         for (child in children)
             child.appendTo(appendable, context)
+    }
+
+    suspend fun outputChildren(out: CoOutput, context: Context) {
+        for (child in children)
+            child.outputTo(out, context)
     }
 
 }

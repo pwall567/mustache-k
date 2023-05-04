@@ -2,7 +2,7 @@
  * @(#) Template.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ import java.io.Reader
 import java.nio.charset.Charset
 
 import io.kjson.mustache.parser.Parser
+import net.pwall.util.CoOutput
 
 /**
  * A Mustache template.
@@ -43,8 +44,16 @@ class Template internal constructor(children: List<Element>): ElementWithChildre
         appendChildren(appendable, context)
     }
 
+    override suspend fun outputTo(out: CoOutput, context: Context) {
+        outputChildren(out, context)
+    }
+
     fun renderTo(appendable: Appendable, contextObject: Any? = null) {
         appendTo(appendable, Context(contextObject))
+    }
+
+    suspend fun coRender(contextObject: Any? = null, out: CoOutput) {
+        outputTo(out, Context(contextObject))
     }
 
     fun render(contextObject: Any? = null): String = StringBuilder().also {

@@ -2,7 +2,7 @@
  * @(#) TextElement.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,9 @@
 
 package io.kjson.mustache
 
+import io.kjson.mustache.Element.Companion.outputString
+import net.pwall.util.CoOutput
+
 /**
  * A text element - text that is copied to the output without modification.
  *
@@ -34,6 +37,10 @@ class TextElement(private val text: String) : Element {
 
     override fun appendTo(appendable: Appendable, context: Context) {
         appendable.append(text)
+    }
+
+    override suspend fun outputTo(out: CoOutput, context: Context) {
+        out.outputString(text)
     }
 
 }

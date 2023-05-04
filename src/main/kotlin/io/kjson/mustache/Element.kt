@@ -2,7 +2,7 @@
  * @(#) Element.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,9 @@
 
 package io.kjson.mustache
 
+import net.pwall.util.CoOutput
+import net.pwall.util.output
+
 /**
  * A Mustache template element (a Variable, Section _etc._)
  *
@@ -36,5 +39,20 @@ sealed interface Element {
      * Append the result of this element (when evaluated against a specified [Context]) to an [Appendable].
      */
     fun appendTo(appendable: Appendable, context: Context)
+
+    /**
+     * Output the result of this element (when evaluated against a specified [Context]) to a non-blocking output
+     * function.
+     */
+    suspend fun outputTo(out: CoOutput, context: Context)
+
+    companion object {
+
+        suspend fun CoOutput.outputString(string: String) {
+            for (ch in string)
+                output(ch)
+        }
+
+    }
 
 }

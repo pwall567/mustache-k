@@ -2,7 +2,7 @@
  * @(#) Variable.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,15 @@
 
 package io.kjson.mustache
 
+import net.pwall.pipeline.AbstractIntCoAcceptor
 import net.pwall.pipeline.AppendableAcceptor
+import net.pwall.pipeline.accept
+import net.pwall.pipeline.codec.CoCodePoint_UTF16
+import net.pwall.pipeline.codec.CodePoint_UTF16
+import net.pwall.pipeline.html.HTMLCoEncoder
 import net.pwall.pipeline.html.HTMLEncoder
+import net.pwall.util.CoOutput
+import net.pwall.util.output
 
 /**
  * A Variable template element - outputs a specified value escaped for HTML.
@@ -37,7 +44,19 @@ class Variable(private val name: String) : Element {
 
     override fun appendTo(appendable: Appendable, context: Context) {
         context.resolve(name)?.let {
-            HTMLEncoder<Unit>(AppendableAcceptor(appendable)).accept(it.toString())
+            HTMLEncoder<Unit>(CodePoint_UTF16(AppendableAcceptor(appendable))).accept(it.toString())
+        }
+    }
+
+    override suspend fun outputTo(out: CoOutput, context: Context) {
+        context.resolve(name)?.let {
+            HTMLCoEncoder<Unit>(CoCodePoint_UTF16(OutputAcceptor(out))).accept(it.toString())
+        }
+    }
+
+    class OutputAcceptor<R>(val out: CoOutput) : AbstractIntCoAcceptor<R>() {
+        override suspend fun acceptInt(value: Int) {
+            out.output(value.toChar())
         }
     }
 

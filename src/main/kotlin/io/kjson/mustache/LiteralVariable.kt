@@ -2,7 +2,7 @@
  * @(#) LiteralVariable.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,11 @@
 
 package io.kjson.mustache
 
+import io.kjson.mustache.Element.Companion.outputString
+import net.pwall.util.CoIntOutput.outputInt
+import net.pwall.util.CoIntOutput.outputLong
+import net.pwall.util.CoOutput
+
 /**
  * A literal Variable template element - outputs a specified value without HTML escaping.
  *
@@ -34,6 +39,16 @@ class LiteralVariable(private val name: String) : Element {
 
     override fun appendTo(appendable: Appendable, context: Context) {
         context.resolve(name)?.let { appendable.append(it.toString()) }
+    }
+
+    override suspend fun outputTo(out: CoOutput, context: Context) {
+        context.resolve(name)?.let {
+            when (it) {
+                is Int -> out.outputInt(it)
+                is Long -> out.outputLong(it)
+                else -> out.outputString(it.toString())
+            }
+        }
     }
 
 }
