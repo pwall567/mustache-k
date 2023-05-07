@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.5] - 2023-05-07
+### Changed
+- `pom.xml`: updated dependency version
+- `Section`: added flush to output of `Channel` and `Flow`
+
 ## [1.4] - 2023-05-04
 ### Changed
 - `pom.xml`: updated dependencies, updated Kotlin version to 1.7.21

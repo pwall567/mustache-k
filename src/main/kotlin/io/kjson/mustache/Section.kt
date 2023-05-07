@@ -127,6 +127,8 @@ class Section(private val name: String, children: List<Element>) : ElementWithCh
 
     private suspend fun iterateOverFlow(out: CoOutput, context: Context, flow: Flow<*>) {
         var index = 0
+        if (out is CoOutputFlushable)
+            out.flush()
         flow.collect {
             val flowContext = context.iteratorChild(it, index == 0, false, index, index + 1)
             outputChildren(out, flowContext)
@@ -139,6 +141,8 @@ class Section(private val name: String, children: List<Element>) : ElementWithCh
     private suspend fun iterateOverChannel(out: CoOutput, context: Context, channel: Channel<*>) {
         val iterator = channel.iterator()
         var index = 0
+        if (out is CoOutputFlushable)
+            out.flush()
         while (iterator.hasNext()) {
             val item = iterator.next()
             val channelContext = context.iteratorChild(item, index == 0, false, index, index + 1)
