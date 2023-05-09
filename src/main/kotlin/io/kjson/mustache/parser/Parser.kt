@@ -44,7 +44,6 @@ import io.kjson.mustache.TextElement
 import io.kjson.mustache.Variable
 import io.kjson.resource.ResourceLoader.Companion.derivePath
 import io.kjson.resource.ResourceNotFoundException
-import net.pwall.pipeline.codec.DynamicReader
 
 /**
  * Mustache template parser.
@@ -115,7 +114,11 @@ class Parser private constructor(
     /**
      * Parse a template from an [InputStream] with an optional [Charset].
      */
-    fun parse(inputStream: InputStream, charset: Charset? = this.charset) = parse(DynamicReader(inputStream, charset))
+    // The DynamicReader class is causing unexplained problems, particular when used in a ktor application.
+    // Until these problems are rectified, a more simple implementation is being substituted.
+    //fun parse(inputStream: InputStream, charset: Charset? = this.charset) = parse(DynamicReader(inputStream, charset))
+    fun parse(inputStream: InputStream, charset: Charset? = this.charset) =
+            parse(inputStream.reader(charset ?: Charsets.UTF_8))
 
     /**
      * Parse a template from a [Reader].

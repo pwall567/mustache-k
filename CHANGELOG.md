@@ -2,10 +2,13 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
-## [1.5] - 2023-05-07
+## [1.5] - 2023-05-09
+### Added
+- `Counter`, `Indent`: classes to help with the use of templates
 ### Changed
 - `pom.xml`: updated dependency version
 - `Section`: added flush to output of `Channel` and `Flow`
+- `Parser`: temporary change to avoid suspected Kotlin/ktor bug
 
 ## [1.4] - 2023-05-04
 ### Changed
