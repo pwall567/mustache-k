@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.6] - 2023-05-30
+### Changed
+- `pom.xml`: updated dependency version
+- `README.md`: expanded documentation to cover non-blocking output
+
 ## [1.5] - 2023-05-09
 ### Added
 - `Counter`, `Indent`: classes to help with the use of templates

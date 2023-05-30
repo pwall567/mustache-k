@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/pwall567/mustache-k.svg?branch=main)](https://app.travis-ci.com/github/pwall567/mustache-k)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Kotlin](https://img.shields.io/static/v1?label=Kotlin&message=v1.6.10&color=7f52ff&logo=kotlin&logoColor=7f52ff)](https://github.com/JetBrains/kotlin/releases/tag/v1.6.10)
+[![Kotlin](https://img.shields.io/static/v1?label=Kotlin&message=v1.7.21&color=7f52ff&logo=kotlin&logoColor=7f52ff)](https://github.com/JetBrains/kotlin/releases/tag/v1.7.21)
 [![Maven Central](https://img.shields.io/maven-central/v/io.kjson/mustache-k?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.kjson%22%20AND%20a:%mustache-k%22)
 
 [Mustache](https://mustache.github.io/mustache.5.html) template processor for Kotlin
@@ -26,8 +26,8 @@ library; most of the template functionality is the same but the handling of part
 
 Templates are loaded into memory using the `Parser` class, and there are several option for constructing a `Parser`,
 depending on how the templates are stored.
-Templates may invoke other templates (the term used by Mustache is "Partial"), and the Parser needs to have a means of
-resolving the Partial by name.
+Templates may invoke other templates (the term used by Mustache is &ldquo;Partial&rdquo;), and the Parser needs to have
+a means of resolving the Partial by name.
 (For simplicity, the term template is used here to refer to a template or a partial &ndash; in effect they are the
 same.)
 
@@ -58,7 +58,7 @@ parser will take a URL of this form and use it to create a specific locator for 
 ```kotlin
     val parser = Parser(URL("https://raw.githubusercontent.com/pwall567/mustache-k/main/src/test/resources/templates/"))
 ```
-(Note the '/' on the end of the URL &ndash; this will cause this location to be regarded as a directory.)
+(Note the &lsquo;/&rsquo; on the end of the URL &ndash; this will cause this location to be regarded as a directory.)
 
 There is also the `file:` form of URL, and the parser will take this type of URL instead of a file or path reference as
 described above.
@@ -177,8 +177,8 @@ The reference [Mustache Specification](https://github.com/mustache/spec) contain
 Mustache template system.
 This implementation does not include all features covered by the specification; the differences are detailed below.
 
-A Mustache template is a block of text to be copied to the output, interspersed with "tags" that control the
-substitution of values from a supplied object &ndash; the "context object".
+A Mustache template is a block of text to be copied to the output, interspersed with &ldquo;tags&rdquo; that control the
+substitution of values from a supplied object &ndash; the &ldquo;context object&rdquo;.
 All text that is not part of a tag is copied without modification to the generated output.
 The tags are described below.
 
@@ -227,8 +227,8 @@ By default, Mustache performs HTML escaping on the substituted text &ndash; that
 converted to the HTML entity references for those characters.
 For example, `<` is converted to `&lt;` and `&` is converted to `&amp;`.
 
-If this HTML escaping is not required, the literal form of the variable tag may be used - either `{{{name}}}` (three
-braces instead of two) or `{{&name}}` (ampersand before the variable name).
+If this HTML escaping is not required, the literal form of the variable tag may be used &ndash; either `{{{name}}}`
+(three braces instead of two) or `{{&name}}` (ampersand before the variable name).
 
 The name may be a structured name &ndash; see [Name Resolution](#name-resolution) below.
 
@@ -263,14 +263,20 @@ When processing an `Iterable`, additional names are available in the context for
 - `index` (`Int`) &ndash; the index (zero-based) of the item in the collection
 - `index1` (`Int`) &ndash; the index (one-based) of the item in the collection
 
+When rendering to a non-blocking data stream, the section tag can iterate over a `Channel` or a `Flow`.
+In this case, the rendering function will suspend until the next element becomes available, and will terminate only when
+the `Channel` or `Flow` is closed.
+The additional names in the context are available as for `Iterable`, but the `last` property will never be set to `true`
+(since that would require lookahead to see if another element was going to be available).
+
 #### Inverted Sections
 
 An inverted section is a block of text to be processed once, if the value is null or the following:
 
-- `Iterable` (`List` etc.), `Array`, `Map`: if the collection or map is empty
+- `Iterable` (`List` _etc._), `Array`, `Map`: if the collection or map is empty
 - `Enum` values: if the enum does not have the specified value
-- `String` etc.: if the string is empty
-- number types: if the number is non-zero
+- `String` _etc._: if the string is empty
+- number types: if the number is zero
 - `Boolean`: if the value is `false`
 
 Inverted sections are introduced by a opening tag which has a `^` following the two left braces, and closed by a tag
@@ -279,7 +285,7 @@ Sections and inverted sections may nest within each other.
 
 #### Partials
 
-"Partial" is the term given to a nested section &ndash; for example a template in a separate file.
+&ldquo;Partial&rdquo; is the term given to a nested section &ndash; for example a template in a separate file.
 Partials are introduced by a tag with '>' following the two left braces &ndash; the remainder of the tag is the name of
 an external file.
 
@@ -292,9 +298,9 @@ Recursive data structures may be processed by recursive templates.
 
 For cases where the standard double-brace delimiters clash with the text being processed, the delimiters may be changed
 to some other combination of characters for the remainder of the current template.
-A "Set Delimiter" tag consists of the current opening delimiter, immediately followed by an equals sign '=', then the
-new opening delimiter, one or more spaces, the new closing delimiter, an equals sign '=' again, and finally the current
-closing delimiter.
+A &ldquo;Set Delimiter&rdquo; tag consists of the current opening delimiter, immediately followed by an equals sign '=',
+then the new opening delimiter, one or more spaces, the new closing delimiter, an equals sign '=' again, and finally the
+current closing delimiter.
 
 For example, to change the delimiters to `<%` and `%>`:
 ```
@@ -316,7 +322,8 @@ the tag:
 
 The variable or section may be specified in a structured form, e.g. `person.firstName`.
 In this case, the above rules are used for the first part of the name (the part before the first dot), but for the
-subsequent parts only the result of the first part is searched and the enclosing contexts do form part of the process.
+subsequent parts only the result of the first part is searched and the enclosing contexts do form part of the resolution
+process.
 
 ### Whitespace
 
@@ -343,25 +350,25 @@ For example:
 
 ## Dependency Specification
 
-The latest version of the library is 1.5, and it may be obtained from the Maven Central repository.
+The latest version of the library is 1.6, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>io.kjson</groupId>
       <artifactId>mustache-k</artifactId>
-      <version>1.5</version>
+      <version>1.6</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'io.kjson:mustache-k:1.5'
+    implementation 'io.kjson:mustache-k:1.6'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("io.kjson:mustache-k:1.5")
+    implementation("io.kjson:mustache-k:1.6")
 ```
 
 Peter Wall
 
-2023-05-09
+2023-05-30

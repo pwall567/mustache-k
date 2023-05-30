@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>mustache-k</artifactId>
-  <version>1.5</version>
+  <version>1.6</version>
   <name>Mustache template processor for Kotlin</name>
   <packaging>jar</packaging>
   <url>https://github.com/pwall567/mustache-k</url>
@@ -67,12 +67,12 @@
     <dependency>
       <groupId>net.pwall.util</groupId>
       <artifactId>pipelines</artifactId>
-      <version>4.1</version>
+      <version>5.0</version>
     </dependency>
     <dependency>
       <groupId>io.kjson</groupId>
       <artifactId>resource-loader</artifactId>
-      <version>3.2</version>
+      <version>3.3</version>
     </dependency>
     <dependency>
       <groupId>net.pwall.util</groupId>
@@ -82,7 +82,7 @@
     <dependency>
       <groupId>net.pwall.util</groupId>
       <artifactId>co-pipelines</artifactId>
-      <version>1.2</version>
+      <version>2.0</version>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
