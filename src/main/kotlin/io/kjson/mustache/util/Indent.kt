@@ -28,7 +28,7 @@ package io.kjson.mustache.util
 /**
  * A class to help with indentation during template expansion.
  *
- * When the context object for Mustache contains: `val indent: Indent()`, then any references in the template to
+ * When the context object for Mustache contains: `val indent = Indent()`, then any references in the template to
  * `{{&indent}}` will cause nothing to be output.  But if the [increment] value accessor is invoked as a section,
  * creating a nested context, then within that context a reference to `{{&indent}}` will cause 4 spaces (or the number
  * specified as the `size`) to be output.  This may be repeated to any required depth, and is particularly useful for
