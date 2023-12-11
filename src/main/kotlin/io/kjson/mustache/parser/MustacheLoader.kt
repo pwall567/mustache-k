@@ -2,7 +2,7 @@
  * @(#) MustacheLoader.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2021 Peter Wall
+ * Copyright (c) 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,25 +25,23 @@
 
 package io.kjson.mustache.parser
 
-import java.net.URL
-import java.nio.file.Path
 import io.kjson.mustache.Template
 import io.kjson.resource.ResourceDescriptor
 import io.kjson.resource.ResourceLoader
 
+/**
+ * A [ResourceLoader] for Mustache templates.
+ *
+ * @author  Peter Wall
+ */
 class MustacheLoader(
-    directoryPath: Path?,
-    directoryURL: URL,
     private val parser: Parser,
-) : ResourceLoader<Template, MustacheLoader>(directoryPath, directoryURL) {
+) : ResourceLoader<Template>() {
 
-    override var defaultExtension: String? = "mustache"
+    override var defaultExtension: String? = Parser.standardDefaultExtension
 
     override fun load(rd: ResourceDescriptor): Template {
         return parser.parse(rd.getReader())
     }
-
-    override fun resolvedLoader(resourcePath: Path?, resourceURL: URL) =
-            MustacheLoader(resourcePath, resourceURL, parser).also { it.defaultExtension = defaultExtension }
 
 }

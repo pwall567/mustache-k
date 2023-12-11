@@ -2,7 +2,7 @@
  * @(#) Parser.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ import io.kjson.mustache.Template
 import io.kjson.mustache.TemplatePartial
 import io.kjson.mustache.TextElement
 import io.kjson.mustache.Variable
-import io.kjson.resource.ResourceLoader.Companion.derivePath
+import io.kjson.resource.Resource
 import io.kjson.resource.ResourceNotFoundException
 
 /**
@@ -50,60 +50,60 @@ import io.kjson.resource.ResourceNotFoundException
  *
  * @author  Peter Wall
  */
-class Parser private constructor(
-    directoryPath: Path?,
-    directoryURL: URL,
-    private val partialCache: MutableMap<String, Partial> = mutableMapOf(),
+class Parser(
     val resolver: Parser.(String) -> Template = Parser::defaultResolver,
 ) {
 
-    private val loaders = mutableListOf(MustacheLoader(directoryPath, directoryURL, this))
+    private val mustacheLoader = MustacheLoader(this)
+
+    private val directories = mutableListOf<Resource<Template>>()
 
     /**
      * Construct a `Parser` with the nominated directory (as a [File]) as the location for templates.
      */
-    constructor(directory: File) : this(directory.toPath(), directory.toURI().toURL())
+    constructor(directory: File) : this(Parser::defaultResolver) {
+        addDirectory(directory)
+    }
 
     /**
      * Construct a `Parser` with the nominated directory (as a [Path]) as the location for templates.
      */
-    constructor(directoryPath: Path) : this(directoryPath, directoryPath.toUri().toURL())
+    constructor(directoryPath: Path) : this(Parser::defaultResolver) {
+        addDirectory(directoryPath)
+    }
 
     /**
      * Construct a `Parser` with the nominated directory (as a [URL]) as the location for templates.
      */
-    constructor(directoryURL: URL) : this(derivePath(directoryURL), directoryURL)
+    constructor(directoryPath: URL) : this(Parser::defaultResolver) {
+        addDirectory(directoryPath)
+    }
 
-    /**
-     * Construct a `Parser` with a lambda for custom partial resolution.
-     */
-    constructor(resolver: Parser.(String) -> Template = Parser::defaultResolver) :
-            this(currentDirectory.toPath(), currentDirectory.toURI().toURL(), resolver = resolver)
+    private val partialCache: MutableMap<String, Partial> = mutableMapOf()
 
     /** The default extension (initialised to `mustache`) */
     var defaultExtension = standardDefaultExtension
         set(newExtension) {
             val trimmedExtension = if (newExtension.startsWith('.')) newExtension.drop(1) else newExtension
-            if (!extensionRegex.containsMatchIn(trimmedExtension))
+            if (!extensionRegex.matches(trimmedExtension))
                 throw MustacheParserException("Invalid extension - $trimmedExtension")
             field = trimmedExtension
-            for (loader in loaders)
-                loader.defaultExtension = trimmedExtension
+            mustacheLoader.defaultExtension = trimmedExtension
         }
 
     /** The `Charset` to be used to read templates (if `null`, the character set will be determined dynamically) */
     var charset: Charset? = null
 
-    fun addLoader(directory: File) {
-        loaders.add(0, MustacheLoader(directory.toPath(), directory.toURI().toURL(), this).also { it.defaultExtension = defaultExtension })
+    fun addDirectory(directory: File) {
+        directories.add(0, mustacheLoader.resource(directory))
     }
 
-    fun addLoader(directoryPath: Path) {
-        loaders.add(0, MustacheLoader(directoryPath, directoryPath.toUri().toURL(), this).also { it.defaultExtension = defaultExtension })
+    fun addDirectory(directoryPath: Path) {
+        directories.add(0, mustacheLoader.resource(directoryPath))
     }
 
-    fun addLoader(directoryURL: URL) {
-        loaders.add(0, MustacheLoader(derivePath(directoryURL), directoryURL, this).also { it.defaultExtension = defaultExtension })
+    fun addDirectory(directoryURL: URL) {
+        directories.add(0, mustacheLoader.resource(directoryURL))
     }
 
     /**
@@ -233,9 +233,11 @@ class Parser private constructor(
     }
 
     private fun defaultResolver(name: String): Template {
-        for (loader in loaders) {
+        if (directories.isEmpty())
+            directories.add(mustacheLoader.resource(currentDirectory))
+        for (directory in directories) {
             try {
-                return loader.load(name)
+                return directory.resolve(name).load()
             }
             catch (_: ResourceNotFoundException) { // do nothing
             }

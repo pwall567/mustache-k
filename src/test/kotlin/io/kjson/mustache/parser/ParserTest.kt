@@ -36,6 +36,7 @@ import java.nio.file.FileSystems
 
 import io.kjson.mustache.Context
 import io.kjson.mustache.Partial
+import io.kjson.resource.Resource
 import net.pwall.util.CoOutput
 import net.pwall.util.IntOutput
 
@@ -54,7 +55,7 @@ class ParserTest {
     }
 
     @Test fun `should create Parser with resource URL directory`() {
-        val parser = Parser(ParserTest::class.java.getResource("/templates") ?: fail("templates not found"))
+        val parser = Parser(Resource.classPathURL("/templates") ?: fail("templates not found"))
         val template = parser.parseByName("dummy")
         expect("Dummy template\n") { template.render() }
     }
@@ -78,7 +79,7 @@ class ParserTest {
     }
 
     @Test fun `should use custom extension`() {
-        val parser = Parser(ParserTest::class.java.getResource("/templates") ?: fail("templates not found"))
+        val parser = Parser(Resource.classPathURL("/templates") ?: fail("templates not found"))
         parser.defaultExtension = "hbs"
         val template = parser.parseByName("dummy")
         expect("Dummy handlebars\n") { template.render() }
@@ -93,7 +94,7 @@ class ParserTest {
     }
 
     @Test fun `should use custom partial`() {
-        val parser = Parser(ParserTest::class.java.getResource("/templates") ?: fail("templates not found"))
+        val parser = Parser(Resource.classPathURL("/templates") ?: fail("templates not found"))
         parser.addPartial("money", object : Partial {
             override fun appendTo(appendable: Appendable, context: Context) {
                 (context.contextObject as? Long)?.let {
@@ -114,7 +115,7 @@ class ParserTest {
     }
 
     @Test fun `should get existing partial and add it with a new name`() {
-        val parser = Parser(ParserTest::class.java.getResource("/templates") ?: fail("templates not found"))
+        val parser = Parser(Resource.classPathURL("/templates") ?: fail("templates not found"))
         parser.addPartial("extra", parser.getPartial("dummy"))
         val template = parser.parse("{{>extra}}")
         expect("Dummy template\n") { template.render() }
@@ -124,7 +125,7 @@ class ParserTest {
         val parser = Parser(File("src/test/resources/templates"))
         val data = mapOf("list" to listOf(listOf("world", "moon"), listOf("venus", "mars")))
         expect("[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
-        parser.addLoader(File("src/test/resources/templates2"))
+        parser.addDirectory(File("src/test/resources/templates2"))
         expect("2:[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
     }
 
@@ -132,15 +133,15 @@ class ParserTest {
         val parser = Parser(FileSystems.getDefault().getPath("src/test/resources/templates"))
         val data = mapOf("list" to listOf(listOf("world", "moon"), listOf("venus", "mars")))
         expect("[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
-        parser.addLoader(FileSystems.getDefault().getPath("src/test/resources/templates2"))
+        parser.addDirectory(FileSystems.getDefault().getPath("src/test/resources/templates2"))
         expect("2:[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
     }
 
     @Test fun `should use second resource directory - url`() {
-        val parser = Parser(ParserTest::class.java.getResource("/templates") ?: fail("templates not found"))
+        val parser = Parser(Resource.classPathURL("/templates") ?: fail("templates not found"))
         val data = mapOf("list" to listOf(listOf("world", "moon"), listOf("venus", "mars")))
         expect("[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
-        parser.addLoader(ParserTest::class.java.getResource("/templates2") ?: fail("templates2 not found"))
+        parser.addDirectory(Resource.classPathURL("/templates2") ?: fail("templates2 not found"))
         expect("2:[world, moon],\n[venus, mars]\n\n") { parser.parseByName("list").render(data) }
     }
 

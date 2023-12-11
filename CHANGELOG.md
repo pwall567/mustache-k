@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.0] - 2023-12-11
+### Changed
+- `NustacheLoader`, `Parser`: converted to new `ResourceLoader` library
+- `pom.xml`: updated dependency versions
+
 ## [1.10] - 2023-10-15
 ### Changed
 - `pom.xml`: updated dependency version

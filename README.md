@@ -75,7 +75,7 @@ read the templates regardless of whether they are in the main file system or in 
 
 To use this type of URL:
 ```kotlin
-    val parser = Parser(MyClass::class.java.getResource("/templates") ?: throw RuntimeException("templates not found"))
+    val parser = Parser(Resource.classPathURL("/templates") ?: throw RuntimeException("templates not found"))
 ```
 The `throw` is required because the `getResource()` function may return null.
 
