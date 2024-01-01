@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.3] - 2024-01-01
+### Changed
+- `pom.xml`: updated dependency version
+
 ## [2.2] - 2023-12-20
 ### Changed
 - `pom.xml`: updated dependency version
@@ -12,7 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [2.0] - 2023-12-11
 ### Changed
-- `NustacheLoader`, `Parser`: converted to new `ResourceLoader` library
+- `MustacheLoader`, `Parser`: converted to new `ResourceLoader` library
 - `pom.xml`: updated dependency versions
 
 ## [1.10] - 2023-10-15
