@@ -322,8 +322,8 @@ the tag:
 
 The variable or section may be specified in a structured form, e.g. `person.firstName`.
 In this case, the above rules are used for the first part of the name (the part before the first dot), but for the
-subsequent parts only the result of the first part is searched and the enclosing contexts do form part of the resolution
-process.
+subsequent parts only the result of the first part is searched and the enclosing contexts do not form part of the
+resolution process.
 
 ### Whitespace
 
@@ -350,25 +350,25 @@ For example:
 
 ## Dependency Specification
 
-The latest version of the library is 2.6, and it may be obtained from the Maven Central repository.
+The latest version of the library is 2.7, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>io.kjson</groupId>
       <artifactId>mustache-k</artifactId>
-      <version>2.6</version>
+      <version>2.7</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'io.kjson:mustache-k:2.6'
+    implementation 'io.kjson:mustache-k:2.7'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("io.kjson:mustache-k:2.6")
+    implementation("io.kjson:mustache-k:2.7")
 ```
 
 Peter Wall
 
-2024-02-18
+2024-03-11

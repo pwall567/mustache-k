@@ -2,7 +2,7 @@
  * @(#) TemplateTest.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2024 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -82,6 +82,24 @@ class TemplateTest {
         val template = Template(listOf(TextElement("data:"), section))
         val data = mapOf("items" to listOf(TestClass("world"), TestClass("moon")))
         expect("data: hello, world; hello, moon;") { template.render(data) }
+    }
+
+    @Test fun `should output list size`() {
+        val template = Template(listOf(Variable("list.size")))
+        val data = mapOf("list" to listOf(1, 2, 3))
+        expect("3") { template.render(data) }
+    }
+
+    @Test fun `should output list entries`() {
+        val template = Template(listOf(Variable("list.2")))
+        val data = mapOf("list" to listOf(111, 222, 333))
+        expect("333") { template.render(data) }
+    }
+
+    @Test fun `should output string length`() {
+        val template = Template(listOf(Variable("string.length")))
+        val data = mapOf("string" to "Hello!")
+        expect("6") { template.render(data) }
     }
 
     @Test fun `should output to Appendable`() {

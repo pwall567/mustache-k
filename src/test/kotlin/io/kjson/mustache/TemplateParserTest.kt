@@ -2,7 +2,7 @@
  * @(#) TemplateParserTest.kt
  *
  * mustache-k  Mustache template processor for Kotlin
- * Copyright (c) 2020, 2021 Peter Wall
+ * Copyright (c) 2020, 2021, 2024 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -173,8 +173,16 @@ class TemplateParserTest {
         expect("Hello World (and Moon)") { template.render(data2) }
     }
 
+    @Test fun `should accept kebab-case names`() {
+        val template = Template.parse("Kebab {{&data.kebab-case-name}}")
+        val data = mapOf("data" to KebabCase("correct"))
+        expect("Kebab correct") { template.render(data) }
+    }
+
     data class Recursive(val text: String, val list: List<Recursive>)
 
     enum class TestEnum { A, B, C }
+
+    data class KebabCase(@Suppress("PropertyName") val `kebab-case-name`: String)
 
 }

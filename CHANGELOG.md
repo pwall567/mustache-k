@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.7] - 2024-03-11
+### Changed
+- `Context`: fixed bug in accessing `List`s
+
 ## [2.6] - 2024-02-18
 ### Changed
 - `pom.xml`: updated dependency version
