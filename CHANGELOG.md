@@ -2,6 +2,14 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [3.0] - 2024-07-25
+### Added
+- `build.yml`, `deploy.yml`: converted project to GitHub Actions
+### Changed
+- `pom.xml`: updated dependency versions, upgraded Kotlin version to 1.9.24
+### Removed
+- `.travis.yml`
+
 ## [2.7] - 2024-03-11
 ### Changed
 - `Context`: fixed bug in accessing `List`s
