@@ -26,61 +26,62 @@
 package io.kjson.mustache.util
 
 import kotlin.test.Test
-import kotlin.test.expect
 
 import java.io.StringReader
 
+import io.kstuff.test.shouldBe
+import io.kstuff.test.shouldBeSameInstance
+
 import io.kjson.mustache.Template
-import kotlin.test.assertSame
 
 class IndentTest {
 
     @Test fun `should create initial Indent`() {
         with (Indent()) {
-            expect(0) { level }
-            expect(4) { size }
-            expect(0) { spaces.length }
+            level shouldBe 0
+            size shouldBe 4
+            spaces.length shouldBe 0
         }
         with (Indent(size = 2)) {
-            expect(0) { level }
-            expect(2) { size }
-            expect(0) { spaces.length }
+            level shouldBe 0
+            size shouldBe 2
+            spaces.length shouldBe 0
         }
         with (Indent(3)) {
-            expect(3) { level }
-            expect(4) { size }
-            expect(12) { spaces.length }
+            level shouldBe 3
+            size shouldBe 4
+            spaces.length shouldBe 12
         }
     }
 
     @Test fun `should increment level`() {
         val i = Indent(5, 2)
         with (i.increment) {
-            expect(6) { level }
-            expect(2) { size }
-            expect(12) { spaces.length }
+            level shouldBe 6
+            size shouldBe 2
+            spaces.length shouldBe 12
         }
     }
 
     @Test fun `should return self as property indent`() {
         val i = Indent(5, 2)
-        assertSame(i, i.indent)
+        i.indent shouldBeSameInstance i
     }
 
     @Test fun `should output no indent initially`() {
         val template = Template.parse(StringReader("[{{&indent}}]"))
-        expect("[]") { template.render(Indent()) }
+        template.render(Indent()) shouldBe "[]"
     }
 
     @Test fun `should output incremented indent`() {
         val template = Template.parse(StringReader("[{{#indent.increment}}{{&indent}}{{/indent.increment}}]"))
-        expect("[    ]") { template.render(Indent()) }
+        template.render(Indent()) shouldBe "[    ]"
     }
 
     @Test fun `should output doubly incremented indent`() {
         val template = Template.parse(StringReader(
-                "[{{#indent.increment}}{{#indent.increment}}{{&indent}}{{/indent.increment}}{{/indent.increment}}]"))
-        expect("[        ]") { template.render(Indent()) }
+            "[{{#indent.increment}}{{#indent.increment}}{{&indent}}{{/indent.increment}}{{/indent.increment}}]"))
+        template.render(Indent()) shouldBe "[        ]"
     }
 
 }

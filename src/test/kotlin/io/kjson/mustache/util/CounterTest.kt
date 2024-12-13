@@ -26,82 +26,83 @@
 package io.kjson.mustache.util
 
 import kotlin.test.Test
-import kotlin.test.expect
+
+import io.kstuff.test.shouldBe
 
 class CounterTest {
 
     @Test fun `should create Counter`() {
-        with (Counter()) {
-            expect(0) { value }
-            expect("0") { toString() }
+        with(Counter()) {
+            value shouldBe 0
+            toString() shouldBe "0"
         }
-        with (Counter(1)) {
-            expect(1) { value }
-            expect("1") { toString() }
+        with(Counter(1)) {
+            value shouldBe 1
+            toString() shouldBe "1"
         }
     }
 
     @Test fun `should increment Counter`() {
         val counter = Counter()
-        expect(0) { counter.value }
-        expect("0") { counter.toString() }
+        counter.value shouldBe 0
+        counter.toString() shouldBe "0"
         counter.increment()
-        expect(1) { counter.value }
-        expect("1") { counter.toString() }
+        counter.value shouldBe 1
+        counter.toString() shouldBe "1"
         counter.increment()
-        expect(2) { counter.value }
-        expect("2") { counter.toString() }
+        counter.value shouldBe 2
+        counter.toString() shouldBe "2"
     }
 
     @Test fun `should increment Counter by specified amount`() {
         val counter = Counter()
-        expect(0) { counter.value }
-        expect("0") { counter.toString() }
+        counter.value shouldBe 0
+        counter.toString() shouldBe "0"
         counter.incrementBy(1)
-        expect(1) { counter.value }
-        expect("1") { counter.toString() }
+        counter.value shouldBe 1
+        counter.toString() shouldBe "1"
         counter.incrementBy(5)
-        expect(6) { counter.value }
-        expect("6") { counter.toString() }
+        counter.value shouldBe 6
+        counter.toString() shouldBe "6"
     }
 
     @Test fun `should reset Counter`() {
         val counter = Counter()
-        expect(0) { counter.value }
-        expect("0") { counter.toString() }
+        counter.value shouldBe 0
+        counter.toString() shouldBe "0"
         counter.increment()
-        expect(1) { counter.value }
-        expect("1") { counter.toString() }
+        counter.value shouldBe 1
+        counter.toString() shouldBe "1"
         counter.increment()
-        expect(2) { counter.value }
-        expect("2") { counter.toString() }
+        counter.value shouldBe 2
+        counter.toString() shouldBe "2"
         counter.clear()
-        expect(0) { counter.value }
-        expect("0") { counter.toString() }
+        counter.value shouldBe 0
+        counter.toString() shouldBe "0"
     }
 
     @Test fun `should use units`() {
         val counter = Counter(units = "record")
-        expect(0) { counter.value }
-        expect("0 records") { counter.toString() }
+        counter.value shouldBe 0
+        counter.toString() shouldBe "0 records"
         counter.increment()
-        expect(1) { counter.value }
-        expect("1 record") { counter.toString() }
+        counter.value shouldBe 1
+        counter.toString() shouldBe "1 record"
         counter.increment()
-        expect(2) { counter.value }
-        expect("2 records") { counter.toString() }
+        counter.value shouldBe 2
+        counter.toString() shouldBe "2 records"
     }
 
     @Test fun `should use units with irregular plurals`() {
         val counter = Counter(units = "entry", plural = "entries")
-        expect(0) { counter.value }
-        expect("0 entries") { counter.toString() }
+        counter.value shouldBe 0
+        counter.toString() shouldBe "0 entries"
         counter.increment()
-        expect(1) { counter.value }
-        expect("1 entry") { counter.toString() }
+        counter.value shouldBe 1
+        counter.toString() shouldBe "1 entry"
         counter.increment()
-        expect(2) { counter.value }
-        expect("2 entries") { counter.toString() }
+        counter.value shouldBe 2
+        counter.toString() shouldBe "2 entries"
     }
 
 }

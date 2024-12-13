@@ -26,8 +26,9 @@
 package io.kjson.mustache
 
 import kotlin.test.Test
-import kotlin.test.expect
 import kotlinx.coroutines.runBlocking
+
+import io.kstuff.test.shouldBe
 
 import net.pwall.util.CoOutput
 import net.pwall.util.output
@@ -36,84 +37,84 @@ class TemplateTest {
 
     @Test fun `should output empty string from empty template`() {
         val template = Template(listOf())
-        expect("") { template.render() }
+        template.render() shouldBe ""
         val sb = StringBuilder()
         template.renderTo(sb)
-        expect("") { sb.toString() }
+        sb.toString() shouldBe ""
     }
 
     @Test fun `should output text-only template`() {
         val template = Template(listOf(TextElement("hello")))
-        expect("hello") { template.render() }
+        template.render() shouldBe "hello"
         val sb = StringBuilder()
         template.renderTo(sb)
-        expect("hello") { sb.toString() }
+        sb.toString() shouldBe "hello"
     }
 
     @Test fun `should output template with variable`() {
         val template = Template(listOf(TextElement("hello, "), Variable("aaa")))
         val data = TestClass("world")
-        expect("hello, world") { template.render(data) }
+        template.render(data) shouldBe "hello, world"
         val sb = StringBuilder()
         template.renderTo(sb, data)
-        expect("hello, world") { sb.toString() }
+        sb.toString() shouldBe "hello, world"
     }
 
     @Test fun `should output template variables escaped by default`() {
         val template = Template(listOf(TextElement("hello, "), Variable("aaa")))
         val data = TestClass("<world>")
-        expect("hello, &lt;world&gt;") { template.render(data) }
+        template.render(data) shouldBe "hello, &lt;world&gt;"
         val sb = StringBuilder()
         template.renderTo(sb, data)
-        expect("hello, &lt;world&gt;") { sb.toString() }
+        sb.toString() shouldBe "hello, &lt;world&gt;"
     }
 
     @Test fun `should output literal template variables unescaped`() {
         val template = Template(listOf(TextElement("hello, "), LiteralVariable("aaa")))
         val data = TestClass("<world>")
-        expect("hello, <world>") { template.render(data) }
+        template.render(data) shouldBe "hello, <world>"
         val sb = StringBuilder()
         template.renderTo(sb, data)
-        expect("hello, <world>") { sb.toString() }
+        sb.toString() shouldBe "hello, <world>"
     }
 
     @Test fun `should output section for each member of list`() {
         val section = Section("items", listOf(TextElement(" hello, "), Variable("aaa"), TextElement(";")))
         val template = Template(listOf(TextElement("data:"), section))
         val data = mapOf("items" to listOf(TestClass("world"), TestClass("moon")))
-        expect("data: hello, world; hello, moon;") { template.render(data) }
+        template.render(data) shouldBe "data: hello, world; hello, moon;"
     }
 
     @Test fun `should output list size`() {
         val template = Template(listOf(Variable("list.size")))
         val data = mapOf("list" to listOf(1, 2, 3))
-        expect("3") { template.render(data) }
+        template.render(data) shouldBe "3"
     }
 
     @Test fun `should output list entries`() {
         val template = Template(listOf(Variable("list.2")))
         val data = mapOf("list" to listOf(111, 222, 333))
-        expect("333") { template.render(data) }
+        template.render(data) shouldBe "333"
     }
 
     @Test fun `should output string length`() {
         val template = Template(listOf(Variable("string.length")))
         val data = mapOf("string" to "Hello!")
-        expect("6") { template.render(data) }
+        template.render(data) shouldBe "6"
     }
 
     @Test fun `should output to Appendable`() {
         val template = Template(listOf(TextElement("hello")))
         val stringBuilder = StringBuilder()
         template.renderTo(stringBuilder)
-        expect("hello") { stringBuilder.toString() }
+        stringBuilder.toString() shouldBe "hello"
     }
 
     @Test fun `should output to CoOutput`() = runBlocking {
         val template = Template(listOf(TextElement("hello")))
         val coCapture = CoCapture()
         template.coRender { coCapture.output(it) }
-        expect("hello") { coCapture.toString() }
+        coCapture.toString() shouldBe "hello"
     }
 
     @Test fun `should output list to CoOutput`() = runBlocking {
@@ -122,7 +123,7 @@ class TemplateTest {
         val data = mapOf("items" to listOf(TestClass("world"), TestClass("moon")))
         val coCapture = CoCapture()
         template.coRender(data) { coCapture.output(it) }
-        expect("data: hello, world; hello, moon;") { coCapture.toString() }
+        coCapture.toString() shouldBe "data: hello, world; hello, moon;"
     }
 
     @Test fun `should output to CoOutput with HTML escaping`() = runBlocking {
@@ -130,7 +131,7 @@ class TemplateTest {
         val data = TestClass("<world>")
         val coCapture = CoCapture()
         template.coRender(data, coCapture)
-        expect("hello, &lt;world&gt;") { coCapture.toString() }
+        coCapture.toString() shouldBe "hello, &lt;world&gt;"
     }
 
     class CoCapture(size: Int = 256) : CoOutput {

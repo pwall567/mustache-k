@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>mustache-k</artifactId>
-  <version>3.4</version>
+  <version>3.5</version>
   <name>Mustache template processor for Kotlin</name>
   <packaging>jar</packaging>
   <url>https://github.com/pwall567/mustache-k</url>
@@ -62,7 +62,7 @@
     <dependency>
       <groupId>io.kjson</groupId>
       <artifactId>kjson-core</artifactId>
-      <version>9.1</version>
+      <version>9.2</version>
     </dependency>
     <dependency>
       <groupId>net.pwall.util</groupId>
@@ -102,6 +102,12 @@
       <groupId>net.pwall.util</groupId>
       <artifactId>int-output</artifactId>
       <version>2.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.kstuff</groupId>
+      <artifactId>should-test</artifactId>
+      <version>4.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>

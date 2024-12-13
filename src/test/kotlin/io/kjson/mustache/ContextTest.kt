@@ -26,22 +26,23 @@
 package io.kjson.mustache
 
 import kotlin.test.Test
-import kotlin.test.expect
+
+import io.kstuff.test.shouldBe
 
 class ContextTest {
 
     @Test fun `should retrieve property from map`() {
         val testMap = mapOf("aaa" to "Hello", "bbb" to "World")
         val context = Context(testMap)
-        expect("Hello") { context.resolve("aaa") }
-        expect("World") { context.resolve("bbb") }
+        context.resolve("aaa") shouldBe "Hello"
+        context.resolve("bbb") shouldBe "World"
     }
 
     @Test fun `should retrieve property from data class`() {
         val testClass = TestClass("Hello", "World")
         val context = Context(testClass)
-        expect("Hello") { context.resolve("aaa") }
-        expect("World") { context.resolve("bbb") }
+        context.resolve("aaa") shouldBe "Hello"
+        context.resolve("bbb") shouldBe "World"
     }
 
 }

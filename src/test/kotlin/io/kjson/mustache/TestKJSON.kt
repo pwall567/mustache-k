@@ -26,7 +26,8 @@
 package io.kjson.mustache
 
 import kotlin.test.Test
-import kotlin.test.expect
+
+import io.kstuff.test.shouldBe
 
 import io.kjson.JSON
 
@@ -35,17 +36,17 @@ class TestKJSON {
     @Test fun `should work with KJSON`() {
         val json = JSON.parse("""{"a":"X","b":23,"c":true,"d":false,"e":[1,2,3],"f":"","g":0}""")
         val template1 = Template.parse("a={{&a}}, b={{&b}}, c={{#c}}true{{/c}}{{^c}}false{{/c}}")
-        expect("a=X, b=23, c=true") { template1.render(json) }
+        template1.render(json) shouldBe "a=X, b=23, c=true"
         val template2 = Template.parse("c={{#c}}true{{/c}}{{^c}}false{{/c}}, d={{#d}}true{{/d}}{{^d}}false{{/d}}")
-        expect("c=true, d=false") { template2.render(json) }
+        template2.render(json) shouldBe "c=true, d=false"
         val template3 = Template.parse("-{{#e}}{{.}};{{/e}}-")
-        expect("-1;2;3;-") { template3.render(json) }
+        template3.render(json) shouldBe "-1;2;3;-"
         val template4 = Template.parse("{{^f}}OK{{/f}}")
-        expect("OK") { template4.render(json) }
+        template4.render(json) shouldBe "OK"
         val template5 = Template.parse("{{^g}}OK{{/g}}")
-        expect("OK") { template5.render(json) }
+        template5.render(json) shouldBe "OK"
         val template6 = Template.parse("#{{#g}}OK{{/g}}#")
-        expect("##") { template6.render(json) }
+        template6.render(json) shouldBe "##"
     }
 
 }
