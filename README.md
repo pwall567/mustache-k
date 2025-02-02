@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/pwall567/mustache-k/actions/workflows/build.yml/badge.svg)](https://github.com/pwall567/mustache-k/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Kotlin](https://img.shields.io/static/v1?label=Kotlin&message=v1.9.24&color=7f52ff&logo=kotlin&logoColor=7f52ff)](https://github.com/JetBrains/kotlin/releases/tag/v1.9.24)
+[![Kotlin](https://img.shields.io/static/v1?label=Kotlin&message=v2.0.21&color=7f52ff&logo=kotlin&logoColor=7f52ff)](https://github.com/JetBrains/kotlin/releases/tag/v2.0.21)
 [![Maven Central](https://img.shields.io/maven-central/v/io.kjson/mustache-k?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.kjson%22%20AND%20a:%mustache-k%22)
 
 [Mustache](https://mustache.github.io/mustache.5.html) template processor for Kotlin
@@ -350,25 +350,25 @@ For example:
 
 ## Dependency Specification
 
-The latest version of the library is 3.6, and it may be obtained from the Maven Central repository.
+The latest version of the library is 3.7, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>io.kjson</groupId>
       <artifactId>mustache-k</artifactId>
-      <version>3.6</version>
+      <version>3.7</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'io.kjson:mustache-k:3.6'
+    implementation 'io.kjson:mustache-k:3.7'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("io.kjson:mustache-k:3.6")
+    implementation("io.kjson:mustache-k:3.7")
 ```
 
 Peter Wall
 
-2025-01-14
+2025-02-02

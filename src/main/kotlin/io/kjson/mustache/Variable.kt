@@ -25,15 +25,15 @@
 
 package io.kjson.mustache
 
-import net.pwall.pipeline.AbstractIntCoAcceptor
-import net.pwall.pipeline.AppendableAcceptor
-import net.pwall.pipeline.accept
-import net.pwall.pipeline.codec.CoCodePoint_UTF16
-import net.pwall.pipeline.codec.CodePoint_UTF16
-import net.pwall.pipeline.html.HTMLCoEncoder
-import net.pwall.pipeline.html.HTMLEncoder
-import net.pwall.util.CoOutput
-import net.pwall.util.output
+import io.jstuff.pipeline.AppendableAcceptor
+import io.jstuff.pipeline.codec.CodePoint_UTF16
+import io.jstuff.pipeline.html.HTMLEncoder
+import io.kstuff.pipeline.AbstractIntCoAcceptor
+import io.kstuff.pipeline.accept
+import io.kstuff.pipeline.codec.CoCodePoint_UTF16
+import io.kstuff.pipeline.html.HTMLCoEncoder
+import io.kstuff.util.CoOutput
+import io.kstuff.util.output
 
 /**
  * A Variable template element - outputs a specified value escaped for HTML.

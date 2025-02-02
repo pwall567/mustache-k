@@ -33,8 +33,8 @@ import java.math.BigInteger
 
 import io.kjson.JSONBoolean
 import io.kjson.JSONNumber
-import net.pwall.util.CoOutput
-import net.pwall.util.CoOutputFlushable
+import io.kstuff.util.CoOutput
+import io.kstuff.util.CoOutputFlushable
 
 /**
  * A  Section element - an element that is processed conditionally depending on the contents of the value.

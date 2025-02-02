@@ -25,10 +25,11 @@
 
 package io.kjson.mustache
 
+import io.kstuff.util.CoIntOutput.outputInt
+import io.kstuff.util.CoIntOutput.outputLong
+import io.kstuff.util.CoOutput
+
 import io.kjson.mustache.Element.Companion.outputString
-import net.pwall.util.CoIntOutput.outputInt
-import net.pwall.util.CoIntOutput.outputLong
-import net.pwall.util.CoOutput
 
 /**
  * A literal Variable template element - outputs a specified value without HTML escaping.

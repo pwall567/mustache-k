@@ -25,8 +25,9 @@
 
 package io.kjson.mustache
 
+import io.kstuff.util.CoOutput
+
 import io.kjson.mustache.Element.Companion.outputString
-import net.pwall.util.CoOutput
 
 /**
  * A text element - text that is copied to the output without modification.

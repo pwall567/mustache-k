@@ -30,7 +30,7 @@ import java.math.BigInteger
 
 import io.kjson.JSONBoolean
 import io.kjson.JSONNumber
-import net.pwall.util.CoOutput
+import io.kstuff.util.CoOutput
 
 /**
  * An Inverted Section element - an element that is processed only if the value is false, or empty , or zero.

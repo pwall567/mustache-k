@@ -25,7 +25,7 @@
 
 package io.kjson.mustache
 
-import net.pwall.util.CoOutput
+import io.kstuff.util.CoOutput
 
 /**
  * A Template Partial that refers to another Template.

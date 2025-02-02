@@ -30,8 +30,8 @@ import kotlinx.coroutines.runBlocking
 
 import io.kstuff.test.shouldBe
 
-import net.pwall.util.CoOutput
-import net.pwall.util.output
+import io.kstuff.util.CoOutput
+import io.kstuff.util.output
 
 class TemplateTest {
 

@@ -30,8 +30,9 @@ import java.io.InputStream
 import java.io.Reader
 import java.nio.charset.Charset
 
+import io.kstuff.util.CoOutput
+
 import io.kjson.mustache.parser.Parser
-import net.pwall.util.CoOutput
 
 /**
  * A Mustache template.

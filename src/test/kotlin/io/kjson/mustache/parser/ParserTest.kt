@@ -35,11 +35,12 @@ import java.nio.file.FileSystems
 
 import io.kstuff.test.shouldBe
 
+import io.jstuff.util.IntOutput
+import io.kstuff.util.CoOutput
+import io.kjson.resource.Resource
+
 import io.kjson.mustache.Context
 import io.kjson.mustache.Partial
-import io.kjson.resource.Resource
-import net.pwall.util.CoOutput
-import net.pwall.util.IntOutput
 
 class ParserTest {
 

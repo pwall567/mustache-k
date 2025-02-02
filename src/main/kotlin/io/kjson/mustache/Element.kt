@@ -25,8 +25,8 @@
 
 package io.kjson.mustache
 
-import net.pwall.util.CoOutput
-import net.pwall.util.output
+import io.kstuff.util.CoOutput
+import io.kstuff.util.output
 
 /**
  * A Mustache template element (a Variable, Section _etc._)
