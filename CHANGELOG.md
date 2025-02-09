@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [3.8] - 2025-02-02
+### Changed
+- `LiteralVariable`: minor optimisation
+- `pom.xml`: updated dependency version
+
 ## [3.7] - 2025-02-02
 ### Changed
 - `pom.xml`: updated Kotlin version to 2.0.21, updated dependency versions

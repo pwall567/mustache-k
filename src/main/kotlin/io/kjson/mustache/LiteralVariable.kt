@@ -25,6 +25,8 @@
 
 package io.kjson.mustache
 
+import io.jstuff.util.IntOutput.appendInt
+import io.jstuff.util.IntOutput.appendLong
 import io.kstuff.util.CoIntOutput.outputInt
 import io.kstuff.util.CoIntOutput.outputLong
 import io.kstuff.util.CoOutput
@@ -39,7 +41,13 @@ import io.kjson.mustache.Element.Companion.outputString
 class LiteralVariable(private val name: String) : Element {
 
     override fun appendTo(appendable: Appendable, context: Context) {
-        context.resolve(name)?.let { appendable.append(it.toString()) }
+        context.resolve(name)?.let {
+            when (it) {
+                is Int -> appendInt(appendable, it)
+                is Long -> appendLong(appendable, it)
+                else -> appendable.append(it.toString())
+            }
+        }
     }
 
     override suspend fun outputTo(out: CoOutput, context: Context) {
