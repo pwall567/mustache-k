@@ -4,8 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>mustache-k</artifactId>
-  <version>3.8</version>
+  <version>3.9</version>
   <name>Mustache template processor for Kotlin</name>
+  <description>Mustache template processor for Kotlin</description>
   <packaging>jar</packaging>
   <url>https://github.com/pwall567/mustache-k</url>
 
@@ -72,7 +73,7 @@
     <dependency>
       <groupId>io.kjson</groupId>
       <artifactId>resource-loader</artifactId>
-      <version>6.2</version>
+      <version>6.3</version>
     </dependency>
     <dependency>
       <groupId>io.jstuff</groupId>
@@ -105,7 +106,7 @@
     <dependency>
       <groupId>io.kstuff</groupId>
       <artifactId>should-test</artifactId>
-      <version>4.4</version>
+      <version>4.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
