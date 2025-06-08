@@ -350,25 +350,25 @@ For example:
 
 ## Dependency Specification
 
-The latest version of the library is 3.9, and it may be obtained from the Maven Central repository.
+The latest version of the library is 3.10, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>io.kjson</groupId>
       <artifactId>mustache-k</artifactId>
-      <version>3.9</version>
+      <version>3.10</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'io.kjson:mustache-k:3.9'
+    implementation 'io.kjson:mustache-k:3.10'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("io.kjson:mustache-k:3.9")
+    implementation("io.kjson:mustache-k:3.10")
 ```
 
 Peter Wall
 
-2025-03-14
+2025-06-09
