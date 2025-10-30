@@ -56,14 +56,14 @@ class TemplateParserTest {
 
     @Test fun `should output template variables escaped by default`() {
         val template = Template.parse("hello, {{aaa}}")
-        val data = TestClass("<\u20ACeuro>")
-        template.render(data) shouldBe "hello, &lt;&euro;euro&gt;"
+        val data = TestClass("<\u20ACeuro>\n")
+        template.render(data) shouldBe "hello, &lt;&euro;euro&gt;\n"
     }
 
     @Test fun `should output literal variables unescaped`() {
         val template = Template.parse("hello, {{{aaa}}}!")
-        val data = TestClass("<world>")
-        template.render(data) shouldBe "hello, <world>!"
+        val data = TestClass("<world>\n")
+        template.render(data) shouldBe "hello, <world>\n!"
     }
 
     @Test fun `should output section for each member of list`() {
@@ -126,6 +126,13 @@ class TemplateParserTest {
         template.render(mapOf("eee" to TestEnum.C)) shouldBe "data: QR"
     }
 
+    @Test fun `should output section conditionally depending on enum including content`() {
+        val template = Template.parse("data: {{#eee}}{{#AA}}Q-{{&extra}}{{/AA}}{{#BB}}R{{/BB}}{{#CC}}S{{/CC}}{{/eee}}")
+        template.render(mapOf("eee" to TestEnum2.AA)) shouldBe "data: Q-alpha"
+        template.render(mapOf("eee" to TestEnum2.BB)) shouldBe "data: R"
+        template.render(mapOf("eee" to TestEnum2.CC)) shouldBe "data: S"
+    }
+
     @Test fun `should use recursive partial`() {
         val template = Template.parse(File("src/test/resources/templates/recursive.mustache"))
         val recursive1 = Recursive("abc", emptyList())
@@ -183,6 +190,8 @@ class TemplateParserTest {
     data class Recursive(val text: String, val list: List<Recursive>)
 
     enum class TestEnum { A, B, C }
+
+    enum class TestEnum2(val extra: String) { AA("alpha"), BB("beta"), CC("gamma") }
 
     data class KebabCase(@Suppress("PropertyName") val `kebab-case-name`: String)
 
