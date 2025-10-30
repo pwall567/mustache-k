@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## [3.12] - 2025-10-30
 ### Changed
 - `pom.xml`: updated dependency version (fixed issue in HTML-encoded variables)
+- `pom.xml`: changed parent POM to `kstuff-maven`
+- `deploy.yml`: updated server id
 
 ## [3.11] - 2025-06-09
 ### Changed
