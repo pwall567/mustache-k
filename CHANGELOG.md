@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [3.14] - 2025-11-13
+### Changed
+- `pom.xml`: updated dependency versions
+
 ## [3.13] - 2025-11-03
 ### Changed
 - `pom.xml`: updated dependency version
